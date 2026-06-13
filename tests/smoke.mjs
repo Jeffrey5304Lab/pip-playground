@@ -34,10 +34,13 @@ await page.screenshot({ path: join(SHOTS, "1-gate.png") });
 await page.locator("#start-btn").click();
 await page.waitForTimeout(700);
 
-console.log("\n== Home hub ==");
-ok(await page.locator(".room-card").count() === 7, "hub shows 7 game rooms");
-ok(await page.locator(".stat-chip--streak").count() === 1, "home shows streak chip");
-await page.screenshot({ path: join(SHOTS, "2-hub.png") });
+console.log("\n== Level map ==");
+ok(await page.locator(".world").count() === 7, "map shows 7 worlds");
+ok(await page.locator(".node").count() === 21, "map shows 3 nodes per world");
+ok(await page.locator(".node.is-current").count() >= 1, "current node(s) marked");
+ok(await page.locator(".node.is-locked").count() >= 1, "later nodes locked until earned");
+ok(await page.locator(".stat-chip--streak").count() === 1, "map shows streak chip");
+await page.screenshot({ path: join(SHOTS, "2-map.png") });
 
 const fillPct = () => page.evaluate(() => {
   const f = document.querySelector("#lesson-fill");
@@ -79,7 +82,7 @@ async function solve(name) {
 
 async function playLesson(idx, name) {
   console.log(`\n== ${name} ==`);
-  await page.locator(".room-card").nth(idx).click();
+  await page.locator(".world").nth(idx).locator(".node:not(.is-locked)").first().click();
   await page.waitForTimeout(500);
   ok(await page.locator(".lesson-bar").isVisible(), `${name}: lesson progress bar visible`);
 
@@ -108,7 +111,7 @@ async function playLesson(idx, name) {
 }
 
 await playLesson(0, "colors");
-ok(await page.locator(".crown-badge").count() >= 1, "crown badge persisted on hub after a lesson");
+ok(await page.locator('.world[data-room="colors"] .node.is-done').count() >= 1, "completed node shows on map after a lesson");
 await playLesson(1, "shapes");
 await playLesson(2, "numbers");
 await playLesson(3, "animals");

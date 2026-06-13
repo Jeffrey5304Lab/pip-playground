@@ -320,6 +320,71 @@ html, body {
 .choices > *:nth-child(1){ animation-delay: .04s } .choices > *:nth-child(2){ animation-delay: .12s }
 .choices > *:nth-child(3){ animation-delay: .20s } .choices > *:nth-child(4){ animation-delay: .28s }
 
+/* ---------- Level map (winding path) ---------- */
+.map {
+  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding: 4px 0 36px;
+}
+.map::-webkit-scrollbar { display: none; }
+
+.world { position: relative; padding: 0 0 6px; }
+.world__banner {
+  display: flex; align-items: center; gap: 10px; margin: 12px 8px 2px;
+  background: var(--world); color: #fff; padding: 10px 16px; border-radius: 20px;
+  box-shadow: 0 7px 0 rgba(0,0,0,.16), 0 12px 22px var(--shadow);
+  font-weight: 800; font-size: clamp(18px, 5vw, 22px);
+  position: sticky; top: 4px; z-index: 6;
+}
+.world__icon { width: 30px; height: 30px; background: #fff; border-radius: 10px; padding: 3px; display: grid; place-items: center; }
+.world__icon .art { width: 100%; height: 100%; }
+.world__name { flex: 1; text-shadow: 0 2px 3px rgba(0,0,0,.18); }
+.world__crowns { display: inline-flex; align-items: center; gap: 5px; font-size: 18px; }
+.world__crowns .glyph { width: 22px; height: 22px; }
+
+.world__path { position: relative; padding: 16px 0 8px; }
+.world__path::before {
+  content: ""; position: absolute; left: 50%; top: 8px; bottom: 8px; transform: translateX(-50%);
+  border-left: 6px dashed color-mix(in srgb, var(--world) 50%, #fff);
+  opacity: .65; border-radius: 6px;
+}
+.node {
+  --dx: 0px; position: relative; display: block; width: 92px; height: 84px; margin: 14px auto;
+  border: none; border-radius: 50%; cursor: pointer; background: var(--world);
+  transform: translateX(var(--dx)); z-index: 2;
+  box-shadow: 0 9px 0 color-mix(in srgb, var(--world) 62%, #000 24%), 0 14px 22px var(--shadow);
+  transition: box-shadow .1s ease;
+}
+.node::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0) 50%);
+}
+.node:active { transform: translateX(var(--dx)) translateY(6px); box-shadow: 0 3px 0 color-mix(in srgb, var(--world) 62%, #000 24%), 0 8px 12px var(--shadow); }
+.node:nth-child(3n+1) { --dx: -52px; }
+.node:nth-child(3n+2) { --dx: 52px; }
+.node:nth-child(3n)   { --dx: 0px; }
+.node__face { position: absolute; inset: 0; display: grid; place-items: center; }
+.node__face .glyph { width: 40px; height: 40px; }
+
+.node.is-locked {
+  background: #d9cfc0; cursor: default;
+  box-shadow: 0 7px 0 #b6ab98, 0 10px 16px var(--shadow);
+}
+.node.is-locked::after { opacity: .5; }
+.node.is-locked .node__face .glyph { width: 34px; height: 34px; }
+.node.is-shake { animation: wiggle .4s ease; }
+
+.node.is-current { animation: node-glow 1.7s ease-in-out infinite; }
+.node__start {
+  position: absolute; left: 50%; top: -32px; transform: translateX(-50%);
+  background: #fff; color: var(--world); font-weight: 800; font-size: 13px; letter-spacing: .5px;
+  padding: 5px 13px; border-radius: 12px; box-shadow: 0 5px 10px var(--shadow); white-space: nowrap; z-index: 4;
+  animation: start-bob 1.6s ease-in-out infinite;
+}
+.node__start::after { content: ""; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #fff; }
+.node__pip { position: absolute; left: 84px; top: -4px; width: 78px; pointer-events: none; z-index: 3; }
+@keyframes node-glow { 0%,100% { filter: drop-shadow(0 0 0 rgba(255,255,255,0)); } 50% { filter: drop-shadow(0 0 9px rgba(255,255,255,.85)); } }
+@keyframes start-bob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-6px); } }
+
 /* ---------- Lesson progress (Duolingo-style) ---------- */
 .topbar--lesson { gap: 14px; }
 .icon-btn--close { width: 52px; height: 52px; border-radius: 18px; }

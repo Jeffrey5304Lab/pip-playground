@@ -24,14 +24,16 @@ const $ = (s, r = document) => r.querySelector(s);
 const LESSON_LEN = 5;
 
 const ROOMS = [
-  { id: "colors",  label: "Colors",  icon: artIcon.colors,  cls: "room--colors",  game: colorsGame,   praise: ["Great job!", "Wonderful!", "You did it!"] },
-  { id: "shapes",  label: "Shapes",  icon: artIcon.shapes,  cls: "room--shapes",  game: shapesGame,   praise: ["Awesome!", "Nice!", "Yay!"] },
-  { id: "count",   label: "Numbers", icon: artIcon.numbers, cls: "room--count",   game: countingGame, praise: ["Perfect!", "Well done!", "Hooray!"] },
-  { id: "animals", label: "Animals", icon: artIcon.animals, cls: "room--animals", game: animalsGame,  praise: ["Yay!", "So good!", "You got it!"] },
-  { id: "letters", label: "ABC",     icon: artIcon.letters, cls: "room--letters", game: lettersGame,  praise: ["Brilliant!", "Super!", "Way to go!"] },
-  { id: "words",   label: "Words",   icon: artIcon.words,   cls: "room--words",   game: wordsGame,    praise: ["Lovely!", "Great!", "You did it!"] },
-  { id: "pattern", label: "Patterns",icon: artIcon.patterns,cls: "room--pattern", game: patternsGame, praise: ["Clever!", "Smart!", "Amazing!"] },
+  { id: "colors",  label: "Colors",  icon: artIcon.colors,  cls: "room--colors",  color: "#ff5d5d", game: colorsGame,   praise: ["Great job!", "Wonderful!", "You did it!"] },
+  { id: "shapes",  label: "Shapes",  icon: artIcon.shapes,  cls: "room--shapes",  color: "#3d8bff", game: shapesGame,   praise: ["Awesome!", "Nice!", "Yay!"] },
+  { id: "count",   label: "Numbers", icon: artIcon.numbers, cls: "room--count",   color: "#34c46e", game: countingGame, praise: ["Perfect!", "Well done!", "Hooray!"] },
+  { id: "animals", label: "Animals", icon: artIcon.animals, cls: "room--animals", color: "#a25dff", game: animalsGame,  praise: ["Yay!", "So good!", "You got it!"] },
+  { id: "letters", label: "ABC",     icon: artIcon.letters, cls: "room--letters", color: "#ff9233", game: lettersGame,  praise: ["Brilliant!", "Super!", "Way to go!"] },
+  { id: "words",   label: "Words",   icon: artIcon.words,   cls: "room--words",   color: "#ff6fae", game: wordsGame,    praise: ["Lovely!", "Great!", "You did it!"] },
+  { id: "pattern", label: "Patterns",icon: artIcon.patterns,cls: "room--pattern", color: "#28b8b0", game: patternsGame, praise: ["Clever!", "Smart!", "Amazing!"] },
 ];
+
+const NODES_PER_WORLD = 3;
 
 let app, soundBtn, current = null, lesson = null;
 
@@ -82,32 +84,55 @@ function goHome() {
   clearGame();
   say("Pick a game!");
   const s = getState();
+  // first world that still has a lesson to do — that's where Pip waits
+  const pipRoom = ROOMS.findIndex((r) => crownsFor(r.id) < NODES_PER_WORLD);
+
   app.innerHTML = `
     <header class="topbar topbar--home">
       <span class="stat-chip stat-chip--streak">${artUi.flame()}<span>${s.streak}</span></span>
       <span class="stat-chip stat-chip--crown">${artUi.crown()}<span>${totalCrowns()}</span></span>
       <div class="topbar__spacer"></div>
     </header>
-    <section class="hub">
-      <div class="hub__mascot-row">
-        <div class="hub__mascot">${pipSVG({ size: 132 })}</div>
-        <div class="hub__bubble">Hi! Let's play!</div>
-      </div>
-      <div class="grid" id="grid"></div>
-    </section>`;
-  const grid = $("#grid");
-  for (const room of ROOMS) {
-    const c = crownsFor(room.id);
-    const b = document.createElement("button");
-    b.className = `room-card ${room.cls}`;
-    b.setAttribute("aria-label", room.label);
-    b.innerHTML = `
-      ${c ? `<span class="crown-badge">${artUi.crown()}<span>${c}</span></span>` : ""}
-      <span class="room-card__icon" aria-hidden="true">${room.icon()}</span>
-      <span class="room-card__label">${room.label}</span>`;
-    b.onclick = () => { sfxTap(); openRoom(room); };
-    grid.appendChild(b);
+    <section class="map" id="map">${ROOMS.map((room, ri) => worldHTML(room, ri === pipRoom)).join("")}</section>`;
+
+  app.querySelectorAll(".node").forEach((node) => {
+    if (node.classList.contains("is-locked")) {
+      node.onclick = () => { sfxTryAgain(); node.classList.remove("is-shake"); void node.offsetWidth; node.classList.add("is-shake"); };
+      return;
+    }
+    const room = ROOMS.find((r) => r.id === node.dataset.room);
+    node.onclick = () => { sfxTap(); openRoom(room); };
+  });
+
+  // scroll Pip's world into view so the journey starts where the child left off
+  const here = app.querySelector(".node.is-current");
+  if (here) here.scrollIntoView({ block: "center" });
+}
+
+function worldHTML(room, hasPip) {
+  const done = crownsFor(room.id);
+  let nodes = "";
+  for (let i = 0; i < NODES_PER_WORLD; i++) {
+    const state = i < done ? "is-done" : i === done ? "is-current" : "is-locked";
+    const face = state === "is-done" ? artUi.crown() : state === "is-current" ? artUi.play() : artUi.lock();
+    const showPip = hasPip && state === "is-current";
+    nodes += `
+      <button class="node ${state}" data-room="${room.id}" data-node="${i}" style="--world:${room.color}"
+              aria-label="${room.label} lesson ${i + 1}${state === "is-locked" ? " locked" : ""}">
+        ${state === "is-current" ? `<span class="node__start">START</span>` : ""}
+        <span class="node__face">${face}</span>
+        ${showPip ? `<span class="node__pip">${pipSVG({ size: 78 })}</span>` : ""}
+      </button>`;
   }
+  return `
+    <section class="world" data-room="${room.id}" style="--world:${room.color}">
+      <div class="world__banner">
+        <span class="world__icon">${room.icon()}</span>
+        <span class="world__name">${room.label}</span>
+        <span class="world__crowns">${artUi.crown()}<span>${Math.min(done, NODES_PER_WORLD)}/${NODES_PER_WORLD}</span></span>
+      </div>
+      <div class="world__path">${nodes}</div>
+    </section>`;
 }
 
 function openRoom(room) {

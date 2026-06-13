@@ -256,6 +256,16 @@ export const ui = {
   flame: () => glyph(`
     <path d="M24 6 C16 16 12 20 12 28 a12 12 0 0 0 24 0 c0 -6 -4 -10 -6 -14 c-1 4 -4 5 -6 3 c2 -6 0 -12 0 -14z" fill="#ff8a3d"/>
     <path d="M24 24 c-4 4 -5 6 -5 9 a5 5 0 0 0 10 0 c0 -4 -3 -6 -5 -9z" fill="#ffd34e"/>`, "day streak"),
+  lock: () => glyph(`
+    <rect x="13" y="22" width="22" height="17" rx="4" fill="#fff"/>
+    <path d="M18 22 v-4 a6 6 0 0 1 12 0 v4" fill="none" stroke="#fff" stroke-width="4"/>
+    <circle cx="24" cy="30" r="2.6" fill="#b3a695"/>`, "locked"),
+  play: () => glyph(`<path d="M18 14 L34 24 L18 34 Z" fill="#fff"/>`, "start"),
+  book: () => glyph(`
+    <path d="M10 12 q14 -5 14 4 v22 q0 -8 -14 -4z" fill="#ff8fc8"/>
+    <path d="M38 12 q-14 -5 -14 4 v22 q0 -8 14 -4z" fill="#ffa8d4"/>
+    <path d="M24 16 v20" stroke="#e36ba2" stroke-width="2"/>
+    <circle cx="16" cy="9" r="3" fill="#ffd34e"/><circle cx="33" cy="8" r="2.4" fill="#6fe39a"/>`, "sticker book"),
 };
 
 export function star(filled = true) {
