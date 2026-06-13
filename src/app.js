@@ -83,6 +83,24 @@ function start() {
 /* ---------- views ---------- */
 function clearGame() { if (current && current.destroy) current.destroy(); current = null; lesson = null; }
 
+/** Re-trigger the view-enter transition on the freshly painted screen. */
+function flashView() { app.classList.remove("view-enter"); void app.offsetWidth; app.classList.add("view-enter"); }
+
+/** Subtle parallax: drift the sky scenery as the map scrolls. */
+function attachParallax(scroller) {
+  const sky = $(".sky");
+  if (!sky || !scroller || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let ticking = false;
+  scroller.addEventListener("scroll", () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      sky.style.transform = `translateY(${scroller.scrollTop * -0.06}px)`;
+      ticking = false;
+    });
+  }, { passive: true });
+}
+
 function goHome() {
   clearGame();
   say("Pick a game!");
@@ -112,6 +130,8 @@ function goHome() {
   // scroll Pip's world into view so the journey starts where the child left off
   const here = app.querySelector(".node.is-current");
   if (here) here.scrollIntoView({ block: "center" });
+  attachParallax($("#map"));
+  flashView();
 }
 
 function worldHTML(room, hasPip) {
@@ -167,6 +187,7 @@ function openBook() {
     else slot.onclick = () => { sfxTryAgain(); };
     book.appendChild(slot);
   });
+  flashView();
 }
 
 function openRoom(room) {
@@ -177,13 +198,14 @@ function openRoom(room) {
       <button class="icon-btn icon-btn--close" id="home-btn" aria-label="Close lesson">${artUi.close()}</button>
       <div class="lesson-bar"><div class="lesson-fill" id="lesson-fill"></div></div>
     </header>
-    <section class="play">
+    <section class="play" style="--world:${room.color}">
       <div class="prompt"><span id="prompt-text"></span>
         <button class="prompt__say" id="say-btn" aria-label="Say it again">${artUi.replay()}</button>
       </div>
       <div class="stage" id="stage"></div>
     </section>`;
   $("#home-btn").onclick = () => { sfxTap(); goHome(); };
+  flashView();
 
   const promptText = $("#prompt-text");
   let lastSpoken = "";
@@ -262,7 +284,7 @@ function lessonComplete(room) {
   const isNew = awardSticker(stk.id).isNew;
 
   const el = ensureDone();
-  $("#done-pip", el).innerHTML = pipSVG({ size: 132 });
+  $("#done-pip", el).innerHTML = pipSVG({ size: 132, expression: "cheer" });
   $("#done-sticker", el).innerHTML = `
     <div class="sticker-reveal__badge"><span class="sticker-reveal__art">${stk.art()}</span></div>
     <div class="sticker-reveal__label">${isNew ? "New sticker!" : "Sticker!"} <b>${stk.name}</b></div>`;

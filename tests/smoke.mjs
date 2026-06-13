@@ -39,6 +39,7 @@ ok(await page.locator(".world").count() === 7, "map shows 7 worlds");
 ok(await page.locator(".node").count() === 21, "map shows 3 nodes per world");
 ok(await page.locator(".node.is-current").count() >= 1, "current node(s) marked");
 ok(await page.locator(".node.is-locked").count() >= 1, "later nodes locked until earned");
+ok(await page.locator(".node__pip svg").count() >= 1, "Pip stands on the current node");
 ok(await page.locator(".stat-chip--streak").count() === 1, "map shows streak chip");
 await page.screenshot({ path: join(SHOTS, "2-map.png") });
 
@@ -107,6 +108,7 @@ async function playLesson(idx, name) {
   ok(done, `${name}: lesson-complete screen shows after 5 correct`);
   if (done && idx === 0) {
     ok(await page.locator(".sticker-reveal__badge").count() === 1, `${name}: a sticker is revealed on completion`);
+    ok(await page.locator(".lesson-done__pip svg").count() === 1, `${name}: Pip celebrates on the complete screen`);
     await page.screenshot({ path: join(SHOTS, "3-lesson-done.png") });
   }
   await page.locator("#lesson-continue").click();
