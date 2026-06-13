@@ -9,11 +9,14 @@ const today = () => new Date().toISOString().slice(0, 10);
 const yesterday = () => new Date(Date.now() - 864e5).toISOString().slice(0, 10);
 
 function defaults() {
-  return { crowns: {}, stickers: 0, streak: 0, best: 0, lastDay: null, stars: 0, lessons: 0 };
+  return { crowns: {}, owned: [], streak: 0, best: 0, lastDay: null, stars: 0, lessons: 0 };
 }
 function load() {
-  try { return Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY)) || {}); }
-  catch { return defaults(); }
+  try {
+    const s = Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY)) || {});
+    if (!Array.isArray(s.owned)) s.owned = [];   // migrate old saves
+    return s;
+  } catch { return defaults(); }
 }
 
 let state = load();
@@ -26,10 +29,19 @@ export function totalCrowns() { return Object.values(state.crowns).reduce((a, b)
 
 export function addStars(n = 1) { state.stars += n; persist(); }
 
+/* ---- sticker collection ---- */
+export function ownedStickers() { return state.owned; }
+export function ownsSticker(id) { return state.owned.includes(id); }
+export function stickerCount() { return state.owned.length; }
+export function awardSticker(id) {
+  const isNew = !state.owned.includes(id);
+  if (isNew) { state.owned.push(id); persist(); }
+  return { isNew };
+}
+
 /** Call when a full lesson is finished. Returns what was earned. */
 export function completeLesson(roomId) {
   state.crowns[roomId] = (state.crowns[roomId] || 0) + 1;
-  state.stickers += 1;
   state.lessons += 1;
 
   const t = today();
@@ -43,7 +55,6 @@ export function completeLesson(roomId) {
   persist();
   return {
     crowns: state.crowns[roomId],
-    stickers: state.stickers,
     streak: state.streak,
     streakUp,
   };

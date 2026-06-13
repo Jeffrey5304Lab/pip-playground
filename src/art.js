@@ -178,6 +178,21 @@ const objectArt = {
 export function object(name) { return (objectArt[name] || objectArt.apple)(); }
 export const OBJECT_NAMES = Object.keys(objectArt);
 
+/* ---------------- COLLECTIBLE STICKERS ---------------- */
+const cap = (s) => s[0].toUpperCase() + s.slice(1);
+export const STICKERS = [
+  ...ANIMAL_NAMES.map((n) => ({ id: n, name: cap(n), art: () => animal(n) })),
+  ...OBJECT_NAMES.map((n) => ({ id: n, name: cap(n), art: () => object(n) })),
+];
+export function stickerArt(id) {
+  const s = STICKERS.find((x) => x.id === id);
+  return s ? s.art() : "";
+}
+export function stickerName(id) {
+  const s = STICKERS.find((x) => x.id === id);
+  return s ? s.name : "";
+}
+
 /* ---------------- ROOM ICONS ---------------- */
 export const icon = {
   colors: () => wrap(`

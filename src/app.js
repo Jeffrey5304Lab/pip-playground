@@ -5,13 +5,16 @@
    "lesson complete" payoff that awards crowns, stickers & streak.
    ============================================================ */
 import { pipSVG } from "./mascot.js";
-import { icon as artIcon, ui as artUi, star as artStar } from "./art.js";
+import { icon as artIcon, ui as artUi, star as artStar, STICKERS, stickerArt, stickerName } from "./art.js";
 import { initConfetti, burst } from "./confetti.js";
 import {
   unlockAudio, loadMutePref, setMuted, isMuted,
-  say, cheer, sfxTap, sfxCorrect, sfxTryAgain, sfxCelebrate, sfxCount,
+  say, cheer, sfxTap, sfxCorrect, sfxTryAgain, sfxCelebrate, sfxCount, sfxSticker,
 } from "./audio.js";
-import { crownsFor, totalCrowns, getState, completeLesson, addStars } from "./progress.js";
+import {
+  crownsFor, totalCrowns, getState, completeLesson, addStars,
+  ownsSticker, stickerCount, awardSticker,
+} from "./progress.js";
 import { colorsGame } from "./games/colors.js";
 import { shapesGame } from "./games/shapes.js";
 import { countingGame } from "./games/counting.js";
@@ -92,9 +95,11 @@ function goHome() {
       <span class="stat-chip stat-chip--streak">${artUi.flame()}<span>${s.streak}</span></span>
       <span class="stat-chip stat-chip--crown">${artUi.crown()}<span>${totalCrowns()}</span></span>
       <div class="topbar__spacer"></div>
+      <button class="icon-btn" id="book-btn" aria-label="Sticker book">${artUi.book()}</button>
     </header>
     <section class="map" id="map">${ROOMS.map((room, ri) => worldHTML(room, ri === pipRoom)).join("")}</section>`;
 
+  $("#book-btn").onclick = () => { sfxTap(); openBook(); };
   app.querySelectorAll(".node").forEach((node) => {
     if (node.classList.contains("is-locked")) {
       node.onclick = () => { sfxTryAgain(); node.classList.remove("is-shake"); void node.offsetWidth; node.classList.add("is-shake"); };
@@ -133,6 +138,35 @@ function worldHTML(room, hasPip) {
       </div>
       <div class="world__path">${nodes}</div>
     </section>`;
+}
+
+/* ---------- sticker book ---------- */
+function openBook() {
+  clearGame();
+  const total = STICKERS.length, got = stickerCount();
+  say(got ? "Your sticker book!" : "Win lessons to collect stickers!");
+  app.innerHTML = `
+    <header class="topbar topbar--lesson">
+      <button class="icon-btn icon-btn--close" id="book-back" aria-label="Back to map">${artUi.back()}</button>
+      <div class="title-chip"><span class="title-chip__icon">${artUi.book()}</span>Stickers</div>
+      <div class="topbar__spacer"></div>
+      <span class="stat-chip"><span id="book-count">${got}</span>/${total}</span>
+    </header>
+    <section class="book" id="book"></section>`;
+  $("#book-back").onclick = () => { sfxTap(); goHome(); };
+  const book = $("#book");
+  STICKERS.forEach((s, i) => {
+    const owned = ownsSticker(s.id);
+    const slot = document.createElement("button");
+    slot.className = "sticker-slot" + (owned ? " is-owned" : " is-locked");
+    slot.style.animationDelay = `${i * 35}ms`;
+    slot.setAttribute("aria-label", owned ? s.name : "locked sticker");
+    slot.innerHTML = `<span class="sticker-slot__art">${s.art()}</span>
+                      <span class="sticker-slot__name">${owned ? s.name : "?"}</span>`;
+    if (owned) slot.onclick = () => { sfxTap(); cheer(s.name); };
+    else slot.onclick = () => { sfxTryAgain(); };
+    book.appendChild(slot);
+  });
 }
 
 function openRoom(room) {
@@ -206,6 +240,7 @@ function ensureDone() {
     <div class="lesson-done__card">
       <div class="lesson-done__pip" id="done-pip"></div>
       <div class="lesson-done__title">Lesson Complete!</div>
+      <div class="sticker-reveal" id="done-sticker"></div>
       <div class="lesson-done__stats" id="done-stats"></div>
       <button class="big-btn" id="lesson-continue"><span class="big-btn__label">Continue</span></button>
     </div>`;
@@ -220,17 +255,27 @@ function statCard(icon, val, label, cls = "") {
 
 function lessonComplete(room) {
   const earned = completeLesson(room.id);
+
+  // award a sticker — prefer one the child doesn't have yet
+  const unowned = STICKERS.filter((s) => !ownsSticker(s.id));
+  const stk = rand(unowned.length ? unowned : STICKERS);
+  const isNew = awardSticker(stk.id).isNew;
+
   const el = ensureDone();
   $("#done-pip", el).innerHTML = pipSVG({ size: 132 });
+  $("#done-sticker", el).innerHTML = `
+    <div class="sticker-reveal__badge"><span class="sticker-reveal__art">${stk.art()}</span></div>
+    <div class="sticker-reveal__label">${isNew ? "New sticker!" : "Sticker!"} <b>${stk.name}</b></div>`;
   $("#done-stats", el).innerHTML =
     statCard(artUi.crown(), `${earned.crowns}`, "Crowns", "stat-card--crown") +
     statCard(artStar(true), `${lesson.total}/${lesson.total}`, "Correct", "stat-card--star") +
     statCard(artUi.flame(), `${earned.streak}`, "Day streak", "stat-card--streak");
 
   el.classList.add("is-show");
-  burst(140);
+  burst(150);
   sfxCelebrate();
-  cheer(`Lesson complete! ${rand(room.praise)}`);
+  cheer(`Lesson complete! ${isNew ? "You got a new sticker, the " + stk.name + "!" : rand(room.praise)}`);
+  setTimeout(sfxSticker, 480);
 
   $("#lesson-continue", el).onclick = () => {
     sfxTap();

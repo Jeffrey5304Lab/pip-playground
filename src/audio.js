@@ -166,3 +166,13 @@ export function sfxCount(n) {
   const base = 440 + n * 70;
   play([{ f: base, t: 0, d: 0.13, type: "square", gain: 0.12 }]);
 }
+
+/** Sparkly "you got a sticker!" shimmer. */
+export function sfxSticker() {
+  play([
+    { f: 880, t: 0, d: 0.1, type: "sine", gain: 0.16 },
+    { f: 1175, t: 0.08, d: 0.1, type: "sine", gain: 0.16 },
+    { f: 1568, t: 0.16, d: 0.12, type: "sine", gain: 0.18 },
+    { f: 2093, t: 0.26, d: 0.18, type: "sine", gain: 0.16 },
+  ]);
+}

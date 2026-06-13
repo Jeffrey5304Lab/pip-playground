@@ -105,7 +105,10 @@ async function playLesson(idx, name) {
   try { await page.waitForSelector(".lesson-done.is-show", { timeout: 4000 }); }
   catch { done = false; }
   ok(done, `${name}: lesson-complete screen shows after 5 correct`);
-  if (done && idx === 0) await page.screenshot({ path: join(SHOTS, "3-lesson-done.png") });
+  if (done && idx === 0) {
+    ok(await page.locator(".sticker-reveal__badge").count() === 1, `${name}: a sticker is revealed on completion`);
+    await page.screenshot({ path: join(SHOTS, "3-lesson-done.png") });
+  }
   await page.locator("#lesson-continue").click();
   await page.waitForTimeout(500);
 }
@@ -119,11 +122,21 @@ await playLesson(4, "letters");
 await playLesson(5, "words");
 await playLesson(6, "patterns");
 
+console.log("\n== Sticker book ==");
+await page.locator("#book-btn").click();
+await page.waitForTimeout(400);
+ok(await page.locator(".sticker-slot").count() === 16, "sticker book shows all 16 slots");
+ok(await page.locator(".sticker-slot.is-owned").count() >= 1, "earned stickers are unlocked in the book");
+ok(await page.locator(".sticker-slot.is-locked").count() >= 1, "uncollected stickers show as locked");
+await page.screenshot({ path: join(SHOTS, "4-sticker-book.png") });
+await page.locator("#book-back").click();
+await page.waitForTimeout(300);
+
 console.log("\n== Progress persistence ==");
-const crowns = await page.evaluate(() => JSON.parse(localStorage.getItem("pip.save.v1")).crowns);
-ok(Object.keys(crowns).length === 7, "all 7 rooms earned a crown");
-const streak = await page.evaluate(() => JSON.parse(localStorage.getItem("pip.save.v1")).streak);
-ok(streak === 1, `day streak started (=${streak})`);
+const save = await page.evaluate(() => JSON.parse(localStorage.getItem("pip.save.v1")));
+ok(Object.keys(save.crowns).length === 7, "all 7 rooms earned a crown");
+ok(save.streak === 1, `day streak started (=${save.streak})`);
+ok(Array.isArray(save.owned) && save.owned.length >= 1, `stickers persisted (=${save.owned ? save.owned.length : 0})`);
 
 console.log("\n== Console errors ==");
 ok(errors.length === 0, "no console/page errors" + (errors.length ? ": " + errors.join(" | ") : ""));
