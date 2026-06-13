@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffd56b" />
+  <meta name="description" content="Pip's Playground — a cozy learning game for 3 year olds. Colors, shapes, counting and animals." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Pip's Playground" />
+  <title>Pip's Playground</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Sky background layers -->
+  <div class="sky" aria-hidden="true">
+    <div class="sun"></div>
+    <div class="cloud cloud--1"></div>
+    <div class="cloud cloud--2"></div>
+    <div class="cloud cloud--3"></div>
+    <div class="hills"></div>
+  </div>
+
+  <!-- Tap-to-start gate (needed to unlock audio on mobile) -->
+  <div id="gate" class="gate">
+    <div class="gate__card">
+      <div id="gate-mascot" class="gate__mascot"></div>
+      <h1 class="gate__title">Pip's Playground</h1>
+      <p class="gate__sub">Learn &amp; play together</p>
+      <button id="start-btn" class="big-btn big-btn--start" aria-label="Start playing">
+        <span class="big-btn__label">Tap to Play</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- App root -->
+  <main id="app" class="app" hidden></main>
+
+  <!-- Sound toggle -->
+  <button id="sound-toggle" class="sound-toggle" aria-label="Toggle sound" hidden></button>
+
+  <!-- Celebration layer -->
+  <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

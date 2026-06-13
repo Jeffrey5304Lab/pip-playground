@@ -1,0 +1,150 @@
+/* ============================================================
+   audio.js — sound effects + English voice
+   No audio files: SFX are synthesized with Web Audio, and
+   speech uses the built-in SpeechSynthesis voice. Works offline.
+   ============================================================ */
+
+let ctx = null;
+let muted = false;
+let unlocked = false;
+let preferredVoice = null;
+
+const MUTE_KEY = "pip.muted";
+
+function getCtx() {
+  if (!ctx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) ctx = new AC();
+  }
+  return ctx;
+}
+
+/** Must be called from a user gesture (the start button). */
+export function unlockAudio() {
+  const c = getCtx();
+  if (c && c.state === "suspended") c.resume();
+  // Nudge speech engine awake on iOS/Safari.
+  if ("speechSynthesis" in window) {
+    try {
+      const u = new SpeechSynthesisUtterance(" ");
+      u.volume = 0; window.speechSynthesis.speak(u);
+    } catch (_) {}
+  }
+  unlocked = true;
+}
+
+export function isMuted() { return muted; }
+
+export function loadMutePref() {
+  muted = localStorage.getItem(MUTE_KEY) === "1";
+  return muted;
+}
+
+export function setMuted(value) {
+  muted = value;
+  localStorage.setItem(MUTE_KEY, value ? "1" : "0");
+  if (muted && "speechSynthesis" in window) window.speechSynthesis.cancel();
+}
+
+/* ---------- Voice selection ---------- */
+function pickVoice() {
+  if (!("speechSynthesis" in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  const prefer = [
+    /samantha/i, /google us english/i, /google uk english female/i,
+    /karen/i, /moira/i, /tessa/i, /female/i,
+  ];
+  const en = voices.filter((v) => /^en(-|_|$)/i.test(v.lang));
+  for (const re of prefer) {
+    const hit = en.find((v) => re.test(v.name));
+    if (hit) return hit;
+  }
+  return en[0] || voices[0] || null;
+}
+
+if ("speechSynthesis" in window) {
+  preferredVoice = pickVoice();
+  window.speechSynthesis.onvoiceschanged = () => { preferredVoice = pickVoice(); };
+}
+
+/**
+ * Speak an English phrase warmly and slowly for little ears.
+ * @returns {Promise<void>} resolves when speech ends (or immediately if muted)
+ */
+export function say(text, { rate = 0.92, pitch = 1.15, onend } = {}) {
+  return new Promise((resolve) => {
+    if (muted || !("speechSynthesis" in window) || !text) { onend?.(); resolve(); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (preferredVoice) { u.voice = preferredVoice; u.lang = preferredVoice.lang; }
+    else u.lang = "en-US";
+    u.rate = rate; u.pitch = pitch; u.volume = 1;
+    const done = () => { onend?.(); resolve(); };
+    u.onend = done; u.onerror = done;
+    window.speechSynthesis.speak(u);
+  });
+}
+
+/* ---------- Synthesized sound effects ---------- */
+function tone(freq, start, dur, { type = "sine", gain = 0.18, slideTo } = {}) {
+  const c = getCtx();
+  if (!c) return;
+  const t0 = c.currentTime + start;
+  const osc = c.createOscillator();
+  const g = c.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t0);
+  if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(gain, t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(g); g.connect(c.destination);
+  osc.start(t0); osc.stop(t0 + dur + 0.05);
+}
+
+function play(notes) {
+  if (muted) return;
+  const c = getCtx();
+  if (!c) return;
+  if (c.state === "suspended") c.resume();
+  notes.forEach((n) => tone(n.f, n.t, n.d, n));
+}
+
+/** Soft tap/pop for any touch. */
+export function sfxTap() {
+  play([{ f: 320, t: 0, d: 0.12, type: "triangle", gain: 0.16, slideTo: 540 }]);
+}
+
+/** Happy rising chime for a correct choice. */
+export function sfxCorrect() {
+  play([
+    { f: 523, t: 0, d: 0.14, type: "triangle", gain: 0.2 },
+    { f: 659, t: 0.1, d: 0.14, type: "triangle", gain: 0.2 },
+    { f: 784, t: 0.2, d: 0.22, type: "triangle", gain: 0.22 },
+  ]);
+}
+
+/** Gentle, non-scary "try again" — never a harsh buzzer. */
+export function sfxTryAgain() {
+  play([
+    { f: 300, t: 0, d: 0.14, type: "sine", gain: 0.14 },
+    { f: 250, t: 0.1, d: 0.16, type: "sine", gain: 0.14 },
+  ]);
+}
+
+/** Big celebration arpeggio. */
+export function sfxCelebrate() {
+  play([
+    { f: 523, t: 0, d: 0.16, type: "triangle", gain: 0.22 },
+    { f: 659, t: 0.12, d: 0.16, type: "triangle", gain: 0.22 },
+    { f: 784, t: 0.24, d: 0.16, type: "triangle", gain: 0.22 },
+    { f: 1046, t: 0.36, d: 0.3, type: "triangle", gain: 0.24 },
+  ]);
+}
+
+/** A tiny counting "blip" rising with the number. */
+export function sfxCount(n) {
+  const base = 440 + n * 70;
+  play([{ f: base, t: 0, d: 0.13, type: "square", gain: 0.12 }]);
+}

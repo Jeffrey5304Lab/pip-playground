@@ -1,0 +1,14 @@
+{
+  "name": "pips-playground",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pip's Playground — a cozy learning web game for 3 year olds (colors, shapes, numbers, animals).",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8123",
+    "serve": "python3 -m http.server 8123",
+    "test": "NODE_PATH=$(npm root -g) node tests/smoke.mjs"
+  },
+  "keywords": ["kids", "toddler", "education", "pwa", "game", "preschool"],
+  "license": "MIT"
+}
