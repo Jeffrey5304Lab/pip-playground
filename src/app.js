@@ -6,12 +6,15 @@ import { icon as artIcon, ui as artUi, star as artStar, randomReward } from "./a
 import { initConfetti, burst } from "./confetti.js";
 import {
   unlockAudio, loadMutePref, setMuted, isMuted,
-  say, sfxTap, sfxCorrect, sfxTryAgain, sfxCelebrate, sfxCount,
+  say, cheer, sfxTap, sfxCorrect, sfxTryAgain, sfxCelebrate, sfxCount,
 } from "./audio.js";
 import { colorsGame } from "./games/colors.js";
 import { shapesGame } from "./games/shapes.js";
 import { countingGame } from "./games/counting.js";
 import { animalsGame } from "./games/animals.js";
+import { lettersGame } from "./games/letters.js";
+import { wordsGame } from "./games/words.js";
+import { patternsGame } from "./games/patterns.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 
@@ -20,6 +23,9 @@ const ROOMS = [
   { id: "shapes",  label: "Shapes",  icon: artIcon.shapes,  cls: "room--shapes",  game: shapesGame,   praise: ["Awesome!", "Nice!", "Yay!"] },
   { id: "count",   label: "Numbers", icon: artIcon.numbers, cls: "room--count",   game: countingGame, praise: ["Perfect!", "Well done!", "Hooray!"] },
   { id: "animals", label: "Animals", icon: artIcon.animals, cls: "room--animals", game: animalsGame,  praise: ["Yay!", "So good!", "You got it!"] },
+  { id: "letters", label: "ABC",     icon: artIcon.letters, cls: "room--letters", game: lettersGame,  praise: ["Brilliant!", "Super!", "Way to go!"] },
+  { id: "words",   label: "Words",   icon: artIcon.words,   cls: "room--words",   game: wordsGame,    praise: ["Lovely!", "Great!", "You did it!"] },
+  { id: "pattern", label: "Patterns",icon: artIcon.patterns,cls: "room--pattern", game: patternsGame, praise: ["Clever!", "Smart!", "Amazing!"] },
 ];
 
 const starChip = (n) => `<span class="star-chip">${artStar(true)}<span id="star-count">${n}</span></span>`;
@@ -164,7 +170,7 @@ function reward(label, praise, next) {
   el.classList.add("is-show");
   burst(90);
   sfxCelebrate();
-  say(`${label} ${praise}`);
+  cheer(`${label} ${praise}`);
 
   setTimeout(() => {
     el.classList.remove("is-show");

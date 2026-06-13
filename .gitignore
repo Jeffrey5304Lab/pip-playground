@@ -1,4 +1,7 @@
 node_modules/
 tests/shots/
+www/
+ios/
+android/
 .DS_Store
 *.log

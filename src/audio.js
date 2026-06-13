@@ -46,21 +46,29 @@ export function setMuted(value) {
   if (muted && "speechSynthesis" in window) window.speechSynthesis.cancel();
 }
 
-/* ---------- Voice selection ---------- */
+/* ---------- Voice selection ----------
+   Score English voices so we land on the warmest, highest-quality voice the
+   device actually ships (Apple "Enhanced/Premium" neural voices, Google voices),
+   which is the closest thing to human-sounding without any audio downloads. */
+function scoreVoice(v) {
+  let s = 0;
+  const n = v.name.toLowerCase();
+  if (/premium|enhanced|neural|natural/.test(n)) s += 60;      // high-quality variants
+  if (/(^|\b)(samantha|ava|allison|susan|zoe|nicky|joelle|jenny|aria)\b/.test(n)) s += 30; // pleasant US female voices
+  if (/google (us|uk) english/.test(n)) s += 28;
+  if (/karen|moira|tessa|fiona|serena/.test(n)) s += 18;       // pleasant en-* voices
+  if (/en-us/i.test(v.lang)) s += 12; else if (/^en/i.test(v.lang)) s += 6;
+  if (/female/.test(n)) s += 8;
+  if (/male|fred|albert|zarvox|whisper|bells|trinoids|cellos|junior/.test(n)) s -= 25; // novelty/robotic
+  return s;
+}
 function pickVoice() {
   if (!("speechSynthesis" in window)) return null;
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return null;
-  const prefer = [
-    /samantha/i, /google us english/i, /google uk english female/i,
-    /karen/i, /moira/i, /tessa/i, /female/i,
-  ];
   const en = voices.filter((v) => /^en(-|_|$)/i.test(v.lang));
-  for (const re of prefer) {
-    const hit = en.find((v) => re.test(v.name));
-    if (hit) return hit;
-  }
-  return en[0] || voices[0] || null;
+  const pool = en.length ? en : voices;
+  return pool.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] || null;
 }
 
 if ("speechSynthesis" in window) {
@@ -84,6 +92,16 @@ export function say(text, { rate = 0.92, pitch = 1.15, onend } = {}) {
     u.onend = done; u.onerror = done;
     window.speechSynthesis.speak(u);
   });
+}
+
+/** Excited, sing-song delivery for praise/celebration. */
+export function cheer(text) {
+  return say(text, { rate: 1.0, pitch: 1.3 });
+}
+
+/** Calm, clear delivery for a single word/letter (e.g. phonics). */
+export function sayWord(text) {
+  return say(text, { rate: 0.84, pitch: 1.1 });
 }
 
 /* ---------- Synthesized sound effects ---------- */

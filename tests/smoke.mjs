@@ -33,7 +33,7 @@ await page.waitForTimeout(700);
 
 console.log("\n== Home hub ==");
 const rooms = page.locator(".room-card");
-ok(await rooms.count() === 4, "hub shows 4 game rooms");
+ok(await rooms.count() === 7, "hub shows 7 game rooms");
 ok(await page.locator("#sound-toggle").isVisible(), "sound toggle visible");
 await page.screenshot({ path: join(SHOTS, "2-hub.png") });
 
@@ -76,6 +76,24 @@ await playRoom(3, "animals", async () => {
   const sound = (await page.locator("#prompt-text").innerText()).match(/says\s+(\w+)/i)[1].toLowerCase();
   const map = { moo:"cow", woof:"dog", meow:"cat", quack:"duck", baa:"sheep", ribbit:"frog", roar:"lion", oink:"pig" };
   await page.locator(`.animal-card[aria-label="${map[sound]}"]`).click();
+});
+await playRoom(4, "letters", async () => {
+  const L = (await page.locator("#prompt-text").innerText()).match(/Find the (\w)/i)[1].toUpperCase();
+  await page.locator(`.letter-tile[aria-label="${L}"]`).click();
+});
+await playRoom(5, "words", async () => {
+  const w = (await page.locator("#prompt-text").innerText()).match(/Find the (\w+)/i)[1].toLowerCase();
+  await page.locator(`.animal-card[aria-label="${w}"]`).click();
+});
+await playRoom(6, "patterns", async () => {
+  // answer not derivable from DOM; click options until the reward appears (no penalty for wrong)
+  const tokens = page.locator(".choices .token");
+  const n = await tokens.count();
+  for (let i = 0; i < n; i++) {
+    await tokens.nth(i).click();
+    await page.waitForTimeout(250);
+    if (await page.locator(".reward.is-show").count()) break;
+  }
 });
 
 console.log("\n== Console errors ==");

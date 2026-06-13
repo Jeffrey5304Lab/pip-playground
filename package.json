@@ -2,13 +2,28 @@
   "name": "pips-playground",
   "version": "0.1.0",
   "private": true,
-  "description": "Pip's Playground — a cozy learning web game for 3 year olds (colors, shapes, numbers, animals).",
+  "description": "Pip's Playground — a cozy learning web game for 3 year olds (colors, shapes, numbers, animals, ABC, words, patterns).",
   "type": "module",
   "scripts": {
     "start": "python3 -m http.server 8123",
     "serve": "python3 -m http.server 8123",
-    "test": "NODE_PATH=$(npm root -g) node tests/smoke.mjs"
+    "test": "NODE_PATH=$(npm root -g) node tests/smoke.mjs",
+    "build:web": "node scripts/build-web.mjs",
+    "cap:add:ios": "npm run build:web && npx cap add ios",
+    "cap:add:android": "npm run build:web && npx cap add android",
+    "cap:sync": "npm run build:web && npx cap sync",
+    "cap:ios": "npm run build:web && npx cap sync ios && npx cap open ios",
+    "cap:android": "npm run build:web && npx cap sync android && npx cap open android"
   },
   "keywords": ["kids", "toddler", "education", "pwa", "game", "preschool"],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/splash-screen": "^6.0.3"
+  }
 }

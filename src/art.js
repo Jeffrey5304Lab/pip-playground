@@ -117,6 +117,67 @@ const animalArt = {
 export function animal(name) { return (animalArt[name] || animalArt.cow)(); }
 export const ANIMAL_NAMES = Object.keys(animalArt);
 
+/* ---------------- EVERYDAY OBJECTS (first words) ---------------- */
+const objectArt = {
+  apple: () => wrap(`
+    <path d="M60 36 q4 -14 18 -16 q-2 12 -12 16z" fill="#7cc36a"/>
+    <path d="M60 34 q-2 -10 -4 -16" stroke="#8a5a2c" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M60 36 C40 28 20 40 22 64 c2 22 22 40 38 40 c16 0 36 -18 38 -40 C100 40 80 28 60 36z" fill="#ff5d5d"/>
+    <ellipse cx="42" cy="56" rx="8" ry="12" fill="#fff" opacity="0.35"/>`, "apple"),
+  ball: () => wrap(`
+    <circle cx="60" cy="62" r="42" fill="#fff"/>
+    <path d="M60 20 a42 42 0 0 1 0 84" fill="#ff6b6b"/>
+    <path d="M60 20 a42 42 0 0 0 0 84" fill="#4aa8ff"/>
+    <path d="M60 20 q22 42 0 84 q-22 -42 0 -84z" fill="#ffd34e"/>
+    <circle cx="60" cy="62" r="42" fill="none" stroke="#e7d8c2" stroke-width="2"/>
+    <ellipse cx="48" cy="44" rx="10" ry="6" fill="#fff" opacity="0.4"/>`, "ball"),
+  car: () => wrap(`
+    <rect x="14" y="58" width="92" height="30" rx="14" fill="#4aa8ff"/>
+    <path d="M34 60 q6 -22 26 -22 q22 0 30 22z" fill="#74c0ff"/>
+    <rect x="42" y="44" width="16" height="16" rx="4" fill="#dff1ff"/>
+    <rect x="62" y="44" width="16" height="16" rx="4" fill="#dff1ff"/>
+    <circle cx="38" cy="90" r="13" fill="#3d2f22"/><circle cx="38" cy="90" r="6" fill="#cfd8e0"/>
+    <circle cx="82" cy="90" r="13" fill="#3d2f22"/><circle cx="82" cy="90" r="6" fill="#cfd8e0"/>
+    <circle cx="100" cy="70" r="5" fill="#ffd34e"/>`, "car"),
+  sun: () => wrap(`
+    <g stroke="#ffb02e" stroke-width="7" stroke-linecap="round">
+      <path d="M60 14 v12"/><path d="M60 94 v12"/><path d="M14 60 h12"/><path d="M94 60 h12"/>
+      <path d="M28 28 l8 8"/><path d="M84 84 l8 8"/><path d="M92 28 l-8 8"/><path d="M36 84 l-8 8"/>
+    </g>
+    <circle cx="60" cy="60" r="28" fill="#ffd34e"/>
+    <circle cx="52" cy="56" r="3.5" fill="#7a5a1c"/><circle cx="68" cy="56" r="3.5" fill="#7a5a1c"/>
+    <path d="M52 66 q8 7 16 0" stroke="#7a5a1c" stroke-width="3" fill="none" stroke-linecap="round"/>
+    ${cheeks(46, 74, 64, 6)}`, "sun"),
+  cup: () => wrap(`
+    <path d="M30 40 H86 L82 92 q-1 8 -9 8 H43 q-8 0 -9 -8z" fill="#ff8fc8"/>
+    <path d="M30 40 H86 V50 H30z" fill="#ff6fb6"/>
+    <path d="M86 52 q18 0 18 16 q0 14 -18 14" fill="none" stroke="#ff8fc8" stroke-width="8"/>
+    <rect x="55" y="20" width="10" height="22" rx="5" fill="#cfe7ff"/>
+    <ellipse cx="50" cy="64" rx="7" ry="14" fill="#fff" opacity="0.35"/>`, "cup"),
+  fish: () => wrap(`
+    <path d="M82 60 L104 42 V78z" fill="#ff9f43"/>
+    <ellipse cx="52" cy="60" rx="40" ry="28" fill="#ffb04a"/>
+    <path d="M70 40 q8 6 0 14 M74 52 q8 4 0 12" fill="none" stroke="#f08c2a" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="34" cy="54" r="7" fill="#fff"/><circle cx="34" cy="54" r="3.5" fill="#3d2f22"/>
+    ${cheeks(28, 50, 66, 6)}`, "fish"),
+  hat: () => wrap(`
+    <path d="M60 16 L92 90 H28z" fill="#b06bff"/>
+    <path d="M60 16 L76 53 L60 60 L46 53z" fill="#c79bff"/>
+    <circle cx="60" cy="14" r="8" fill="#ffd34e"/>
+    <path d="M24 90 q36 12 72 0 q-2 8 -36 8 q-34 0 -36 -8z" fill="#ff8fc8"/>
+    <circle cx="48" cy="60" r="4" fill="#ffd34e"/><circle cx="70" cy="74" r="4" fill="#4cd17d"/>`, "hat"),
+  flower: () => wrap(`
+    <path d="M60 70 q-3 18 0 38" stroke="#4cb96a" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M60 92 q-16 -6 -22 -16 q16 -2 22 8z" fill="#6fd08a"/>
+    <g fill="#ff8fc8">
+      <circle cx="60" cy="34" r="15"/><circle cx="36" cy="50" r="15"/><circle cx="84" cy="50" r="15"/>
+      <circle cx="45" cy="74" r="15"/><circle cx="75" cy="74" r="15"/>
+    </g>
+    <circle cx="60" cy="56" r="15" fill="#ffd34e"/>`, "flower"),
+};
+export function object(name) { return (objectArt[name] || objectArt.apple)(); }
+export const OBJECT_NAMES = Object.keys(objectArt);
+
 /* ---------------- ROOM ICONS ---------------- */
 export const icon = {
   colors: () => wrap(`
@@ -147,6 +208,25 @@ export const icon = {
     <circle cx="87" cy="44" r="11" fill="#ffd07a"/>
     <circle cx="44" cy="30" r="10" fill="#ffd07a"/>
     <circle cx="76" cy="30" r="10" fill="#ffd07a"/>`, "animals"),
+
+  letters: () => wrap(`
+    <rect x="16" y="40" width="42" height="44" rx="11" fill="#ff8f6b"/>
+    <rect x="62" y="30" width="42" height="44" rx="11" fill="#6fd0ff" transform="rotate(8 83 52)"/>
+    <text x="37" y="74" font-family="Baloo 2, Fredoka, sans-serif" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">A</text>
+    <text x="84" y="64" font-family="Baloo 2, Fredoka, sans-serif" font-size="30" font-weight="800" fill="#fff" text-anchor="middle" transform="rotate(8 84 56)">b</text>`, "letters"),
+
+  words: () => wrap(`
+    <rect x="20" y="26" width="80" height="68" rx="12" fill="#fff3da" stroke="#e7cfa0" stroke-width="3"/>
+    <path d="M60 60 C50 52 38 58 39 70 c1 11 11 18 21 24 c10 -6 20 -13 21 -24 C82 58 70 52 60 60z" fill="#ff6b6b"/>
+    <path d="M30 36 h26 M30 46 h18" stroke="#cdb89a" stroke-width="4" stroke-linecap="round"/>`, "words"),
+
+  patterns: () => wrap(`
+    <circle cx="28" cy="44" r="13" fill="#ff6b6b"/>
+    <rect x="48" y="31" width="26" height="26" rx="7" fill="#4aa8ff"/>
+    <circle cx="92" cy="44" r="13" fill="#ff6b6b"/>
+    <circle cx="28" cy="86" r="13" fill="#4cd17d"/>
+    <rect x="48" y="73" width="26" height="26" rx="7" fill="#ffd34e"/>
+    <path d="M84 78 h16 M92 70 v16" stroke="#b06bff" stroke-width="6" stroke-linecap="round"/>`, "patterns"),
 };
 
 /* ---------------- UI GLYPHS (single stroke language) ---------------- */

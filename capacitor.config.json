@@ -1,0 +1,16 @@
+{
+  "appId": "com.pipplayground.app",
+  "appName": "Pip's Playground",
+  "webDir": "www",
+  "backgroundColor": "#bfe9ff",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 800,
+      "backgroundColor": "#bfe9ff",
+      "showSpinner": false
+    }
+  }
+}
