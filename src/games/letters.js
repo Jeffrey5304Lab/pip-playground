@@ -38,8 +38,7 @@ export function lettersGame(stage, prompt, api) {
     if (L === target) {
       btn.classList.add("is-right");
       api.sfxCorrect();
-      api.say(`${target}! ${target} is for ${WORD_FOR[target]}!`);
-      api.reward(`${target}!`, round);
+      api.reward(`${target} is for ${WORD_FOR[target]}!`, round);
     } else {
       btn.classList.remove("is-wrong"); void btn.offsetWidth; btn.classList.add("is-wrong");
       api.sfxTryAgain();

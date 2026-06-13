@@ -1,4 +1,6 @@
 /* Playwright smoke + interaction test for Pip's Playground.
+   Walks every room through a full lesson and asserts the Duolingo-style
+   progression (progress fill, lesson-complete, persisted crowns).
    Run: NODE_PATH=$(npm root -g) node tests/smoke.mjs            */
 import { chromium } from "playwright";
 import { fileURLToPath } from "url";
@@ -14,9 +16,10 @@ const ok = (c, m) => { if (!c) fails.push(m); console.log((c ? "  ✓ " : "  ✗
 
 const browser = await chromium.launch({
   executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  args: ["--use-fake-ui-for-media-stream"],
 });
 const page = await browser.newPage({ viewport: { width: 414, height: 896 }, deviceScaleFactor: 2 });
+// fresh slate every run
+await page.addInitScript(() => { try { localStorage.clear(); } catch (_) {} });
 
 const errors = [];
 page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
@@ -32,69 +35,92 @@ await page.locator("#start-btn").click();
 await page.waitForTimeout(700);
 
 console.log("\n== Home hub ==");
-const rooms = page.locator(".room-card");
-ok(await rooms.count() === 7, "hub shows 7 game rooms");
-ok(await page.locator("#sound-toggle").isVisible(), "sound toggle visible");
+ok(await page.locator(".room-card").count() === 7, "hub shows 7 game rooms");
+ok(await page.locator(".stat-chip--streak").count() === 1, "home shows streak chip");
 await page.screenshot({ path: join(SHOTS, "2-hub.png") });
 
-async function playRoom(idx, name, makeCorrect) {
+const fillPct = () => page.evaluate(() => {
+  const f = document.querySelector("#lesson-fill");
+  return f ? parseFloat(getComputedStyle(f).width) : 0;
+});
+
+async function solve(name) {
+  const txt = await page.locator("#prompt-text").innerText();
+  if (name === "colors") {
+    const w = txt.match(/Find the (\w+)/i)[1].toLowerCase();
+    await page.locator(`.token[aria-label="${w}"]`).click();
+  } else if (name === "shapes") {
+    const w = txt.match(/Find the (\w+)/i)[1].toLowerCase();
+    await page.locator(`.shape[aria-label="${w}"]`).click();
+  } else if (name === "numbers") {
+    const n = await page.locator(".count-field .critter").count();
+    await page.locator(`.num-btn[aria-label="${n}"]`).click();
+  } else if (name === "animals") {
+    const sound = txt.match(/says\s+(\w+)/i)[1].toLowerCase();
+    const map = { moo:"cow", woof:"dog", meow:"cat", quack:"duck", baa:"sheep", ribbit:"frog", roar:"lion", oink:"pig" };
+    await page.locator(`.animal-card[aria-label="${map[sound]}"]`).click();
+  } else if (name === "letters") {
+    const L = txt.match(/Find the (\w)/i)[1].toUpperCase();
+    await page.locator(`.letter-tile[aria-label="${L}"]`).click();
+  } else if (name === "words") {
+    const w = txt.match(/Find the (\w+)/i)[1].toLowerCase();
+    await page.locator(`.animal-card[aria-label="${w}"]`).click();
+  } else if (name === "patterns") {
+    const before = await fillPct();
+    const tokens = page.locator(".choices .token");
+    const n = await tokens.count();
+    for (let i = 0; i < n; i++) {
+      await tokens.nth(i).click();
+      await page.waitForTimeout(380);
+      if (await fillPct() > before + 1) break;
+    }
+  }
+}
+
+async function playLesson(idx, name) {
   console.log(`\n== ${name} ==`);
   await page.locator(".room-card").nth(idx).click();
   await page.waitForTimeout(500);
-  ok(await page.locator(".prompt").isVisible(), `${name}: prompt bar visible`);
-  const starsBefore = parseInt(await page.locator("#star-count").innerText(), 10);
-  await makeCorrect();
-  let shown = true;
-  try { await page.waitForSelector(".reward.is-show", { timeout: 1500 }); }
-  catch { shown = false; }
-  ok(shown, `${name}: reward overlay shows on correct`);
-  await page.screenshot({ path: join(SHOTS, `3-${name}.png`) });
-  await page.waitForTimeout(1700); // reward auto-dismiss + next round
-  const starsAfter = parseInt(await page.locator("#star-count").innerText(), 10);
-  ok(starsAfter === starsBefore + 1, `${name}: star count incremented (${starsBefore}→${starsAfter})`);
-  await page.locator("#home-btn").click();
-  await page.waitForTimeout(400);
+  ok(await page.locator(".lesson-bar").isVisible(), `${name}: lesson progress bar visible`);
+
+  for (let q = 0; q < 5; q++) {
+    await page.waitForSelector(".stage .choices > *", { timeout: 3000 });
+    if (name !== "patterns") {
+      const before = await fillPct();
+      await solve(name);
+      await page.waitForFunction((b) => {
+        const f = document.querySelector("#lesson-fill");
+        return f && parseFloat(getComputedStyle(f).width) > b + 1;
+      }, before, { timeout: 3000 }).catch(() => {});
+    } else {
+      await solve(name);
+    }
+    if (q < 4) await page.waitForTimeout(820);
+  }
+
+  let done = true;
+  try { await page.waitForSelector(".lesson-done.is-show", { timeout: 4000 }); }
+  catch { done = false; }
+  ok(done, `${name}: lesson-complete screen shows after 5 correct`);
+  if (done && idx === 0) await page.screenshot({ path: join(SHOTS, "3-lesson-done.png") });
+  await page.locator("#lesson-continue").click();
+  await page.waitForTimeout(500);
 }
 
-// Identify the correct choice from the prompt text and pick it.
-await playRoom(0, "colors", async () => {
-  const word = (await page.locator("#prompt-text").innerText()).match(/Find the (\w+)/i)[1].toLowerCase();
-  await page.locator(`.token[aria-label="${word}"]`).click();
-});
-await playRoom(1, "shapes", async () => {
-  const word = (await page.locator("#prompt-text").innerText()).match(/Find the (\w+)/i)[1].toLowerCase();
-  await page.locator(`.shape[aria-label="${word}"]`).click();
-});
-await playRoom(2, "numbers", async () => {
-  const crit = page.locator(".count-field .critter");
-  const n = await crit.count();
-  for (let i = 0; i < n; i++) { await crit.nth(i).click(); await page.waitForTimeout(60); }
-  await page.locator(`.num-btn[aria-label="${n}"]`).click();
-});
-await playRoom(3, "animals", async () => {
-  // prompt asks "Who says <Sound>?" — map back to the animal aria-label via known table
-  const sound = (await page.locator("#prompt-text").innerText()).match(/says\s+(\w+)/i)[1].toLowerCase();
-  const map = { moo:"cow", woof:"dog", meow:"cat", quack:"duck", baa:"sheep", ribbit:"frog", roar:"lion", oink:"pig" };
-  await page.locator(`.animal-card[aria-label="${map[sound]}"]`).click();
-});
-await playRoom(4, "letters", async () => {
-  const L = (await page.locator("#prompt-text").innerText()).match(/Find the (\w)/i)[1].toUpperCase();
-  await page.locator(`.letter-tile[aria-label="${L}"]`).click();
-});
-await playRoom(5, "words", async () => {
-  const w = (await page.locator("#prompt-text").innerText()).match(/Find the (\w+)/i)[1].toLowerCase();
-  await page.locator(`.animal-card[aria-label="${w}"]`).click();
-});
-await playRoom(6, "patterns", async () => {
-  // answer not derivable from DOM; click options until the reward appears (no penalty for wrong)
-  const tokens = page.locator(".choices .token");
-  const n = await tokens.count();
-  for (let i = 0; i < n; i++) {
-    await tokens.nth(i).click();
-    await page.waitForTimeout(250);
-    if (await page.locator(".reward.is-show").count()) break;
-  }
-});
+await playLesson(0, "colors");
+ok(await page.locator(".crown-badge").count() >= 1, "crown badge persisted on hub after a lesson");
+await playLesson(1, "shapes");
+await playLesson(2, "numbers");
+await playLesson(3, "animals");
+await playLesson(4, "letters");
+await playLesson(5, "words");
+await playLesson(6, "patterns");
+
+console.log("\n== Progress persistence ==");
+const crowns = await page.evaluate(() => JSON.parse(localStorage.getItem("pip.save.v1")).crowns);
+ok(Object.keys(crowns).length === 7, "all 7 rooms earned a crown");
+const streak = await page.evaluate(() => JSON.parse(localStorage.getItem("pip.save.v1")).streak);
+ok(streak === 1, `day streak started (=${streak})`);
 
 console.log("\n== Console errors ==");
 ok(errors.length === 0, "no console/page errors" + (errors.length ? ": " + errors.join(" | ") : ""));

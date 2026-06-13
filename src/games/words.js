@@ -28,7 +28,6 @@ export function wordsGame(stage, prompt, api) {
     if (name === target) {
       btn.classList.add("is-active");
       api.sfxCorrect();
-      api.say(`Yes! ${cap(target)}!`);
       api.reward(`${cap(target)}!`, round);
     } else {
       btn.classList.remove("is-active"); void btn.offsetWidth; btn.classList.add("is-active");

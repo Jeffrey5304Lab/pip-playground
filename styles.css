@@ -320,7 +320,88 @@ html, body {
 .choices > *:nth-child(1){ animation-delay: .04s } .choices > *:nth-child(2){ animation-delay: .12s }
 .choices > *:nth-child(3){ animation-delay: .20s } .choices > *:nth-child(4){ animation-delay: .28s }
 
-/* ---------- Reward overlay ---------- */
+/* ---------- Lesson progress (Duolingo-style) ---------- */
+.topbar--lesson { gap: 14px; }
+.icon-btn--close { width: 52px; height: 52px; border-radius: 18px; }
+.icon-btn--close .glyph { width: 26px; height: 26px; }
+.lesson-bar {
+  flex: 1; height: 20px; border-radius: 12px; background: #e9ddc6;
+  box-shadow: inset 0 2px 5px rgba(140,110,70,.25); overflow: hidden;
+}
+.lesson-fill {
+  width: 0%; height: 100%; border-radius: 12px;
+  background: linear-gradient(180deg, #8be36a, #5cc94a);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,.45);
+  transition: width .45s cubic-bezier(.25,1.3,.5,1);
+}
+.lesson-fill::after { content:""; display:block; height:7px; margin:3px 8px 0; border-radius:6px; background:rgba(255,255,255,.4); }
+
+/* progress / streak chips on the home top bar */
+.stat-chip {
+  display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--ink);
+  background: var(--card); padding: 8px 14px 8px 10px; border-radius: 18px; font-size: 20px;
+  box-shadow: 0 5px 0 rgba(180,150,110,.22), 0 8px 14px var(--shadow);
+}
+.stat-chip .glyph { width: 26px; height: 26px; }
+
+/* per-room crown badge */
+.crown-badge {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 3px; font-weight: 800; color: #7a5a1c; font-size: 16px;
+  background: #fff7e0; padding: 4px 9px 4px 6px; border-radius: 14px;
+  box-shadow: 0 3px 6px rgba(0,0,0,.2);
+}
+.crown-badge .glyph { width: 20px; height: 20px; }
+
+/* floating praise on each correct answer */
+.pop-praise {
+  position: fixed; top: 24%; left: 50%; z-index: 46; transform: translate(-50%, 0) scale(.6);
+  display: flex; align-items: center; gap: 8px; pointer-events: none; opacity: 0;
+  background: var(--card); color: var(--ink); font-weight: 800; font-size: clamp(22px, 6vw, 30px);
+  padding: 10px 22px; border-radius: 22px; box-shadow: 0 10px 24px var(--shadow);
+}
+.pop-praise .star-glyph { width: 30px; height: 30px; }
+.pop-praise.is-show { animation: praise-pop 1s ease forwards; }
+@keyframes praise-pop {
+  0% { opacity:0; transform: translate(-50%, 10px) scale(.6); }
+  18% { opacity:1; transform: translate(-50%, 0) scale(1.08); }
+  30% { transform: translate(-50%, 0) scale(1); }
+  75% { opacity:1; }
+  100% { opacity:0; transform: translate(-50%, -28px) scale(1); }
+}
+
+/* ---------- Lesson complete ---------- */
+.lesson-done {
+  position: fixed; inset: 0; z-index: 48; display: grid; place-items: center; padding: 22px;
+  background: rgba(90,70,50,.34); backdrop-filter: blur(4px);
+  opacity: 0; pointer-events: none; transition: opacity .3s ease;
+}
+.lesson-done.is-show { opacity: 1; pointer-events: auto; }
+.lesson-done__card {
+  width: 100%; max-width: 420px; text-align: center; background: var(--card);
+  padding: clamp(20px, 5vw, 34px); border-radius: var(--radius);
+  box-shadow: 0 26px 60px var(--shadow); transform: scale(.7);
+}
+.lesson-done.is-show .lesson-done__card { animation: pop-in .55s cubic-bezier(.18,1.55,.4,1) forwards; }
+.lesson-done__pip { width: clamp(110px, 32vw, 150px); margin: -6px auto 2px; }
+.lesson-done__title { font-size: clamp(26px, 7vw, 36px); font-weight: 800; margin: 0 0 16px; color: #f0962a; }
+.lesson-done__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.stat-card {
+  background: #fff; border-radius: 18px; padding: 12px 6px 10px;
+  box-shadow: inset 0 0 0 2px #f2e7cf, 0 6px 12px rgba(140,110,70,.12);
+  animation: pop-spring .5s cubic-bezier(.2,1.5,.4,1) both;
+}
+.stat-card:nth-child(1){ animation-delay:.12s } .stat-card:nth-child(2){ animation-delay:.24s } .stat-card:nth-child(3){ animation-delay:.36s }
+.stat-card__icon { width: 38px; height: 38px; margin: 0 auto 2px; }
+.stat-card__icon .glyph, .stat-card__icon .star-glyph { width: 38px; height: 38px; }
+.stat-card__val { font-size: clamp(20px, 5.5vw, 26px); font-weight: 800; color: var(--ink); line-height: 1; }
+.stat-card__label { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+.lesson-done .big-btn { width: 100%; }
+.lesson-done .big-btn__label { color: #fff; }
+.lesson-done .big-btn { background: linear-gradient(180deg,#8be36a,#5cc94a); box-shadow: 0 10px 0 #3da534, 0 16px 26px var(--shadow); }
+.lesson-done .big-btn:active { box-shadow: 0 3px 0 #3da534, 0 8px 14px var(--shadow); }
+
+/* ---------- Reward overlay (legacy, unused) ---------- */
 .reward {
   position: fixed; inset: 0; z-index: 40; display: grid; place-items: center;
   background: rgba(90, 70, 50, .28); backdrop-filter: blur(3px);

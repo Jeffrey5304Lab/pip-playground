@@ -39,7 +39,6 @@ export function animalsGame(stage, prompt, api) {
     if (a.name === target.name) {
       btn.classList.add("is-active");
       api.sfxCorrect();
-      api.say(`Yes! The ${a.name} says ${a.sound}!`);
       api.reward(`${a.sound}!`, round);
     } else {
       btn.classList.remove("is-active"); void btn.offsetWidth; btn.classList.add("is-active");

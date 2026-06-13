@@ -247,6 +247,15 @@ export const ui = {
   replay: () => glyph(`
     <path d="M10 22 H17 L26 14 V34 L17 26 H10 Z" fill="#fff"/>
     <path d="M31 19 q5 5 0 10 M35 15 q9 9 0 18" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`, "say it again"),
+  close: () => glyph(`
+    <path d="M14 14 L34 34 M34 14 L14 34" stroke="#8a7560" stroke-width="5" stroke-linecap="round"/>`, "close"),
+  crown: () => glyph(`
+    <path d="M8 34 L12 16 L20 26 L24 12 L28 26 L36 16 L40 34 Z" fill="#ffce4a" stroke="#f0ad1f" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="8" y="34" width="32" height="6" rx="2" fill="#f0ad1f"/>
+    <circle cx="24" cy="12" r="3" fill="#ff8fb0"/>`, "crown"),
+  flame: () => glyph(`
+    <path d="M24 6 C16 16 12 20 12 28 a12 12 0 0 0 24 0 c0 -6 -4 -10 -6 -14 c-1 4 -4 5 -6 3 c2 -6 0 -12 0 -14z" fill="#ff8a3d"/>
+    <path d="M24 24 c-4 4 -5 6 -5 9 a5 5 0 0 0 10 0 c0 -4 -3 -6 -5 -9z" fill="#ffd34e"/>`, "day streak"),
 };
 
 export function star(filled = true) {
