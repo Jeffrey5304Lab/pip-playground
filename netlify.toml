@@ -1,0 +1,12 @@
+# Netlify build config — lets you deploy from your phone with zero typing.
+# When you import this repo in Netlify, these settings are auto-detected.
+[build]
+  command = "node scripts/build-web.mjs"
+  publish = "www"
+
+# SPA-style fallback is not needed (multi-file static site), but ensure the
+# service worker and manifest are served with sensible caching.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
