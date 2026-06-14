@@ -413,6 +413,20 @@ html, body {
 }
 .lesson-fill::after { content:""; display:block; height:7px; margin:3px 8px 0; border-radius:6px; background:rgba(255,255,255,.4); }
 
+/* combo badge — "N in a row!" during a lesson.
+   Fixed so it never resizes the progress bar (stable bar + no jump). */
+.combo-badge {
+  position: fixed; top: calc(80px + var(--safe-top)); right: 16px; z-index: 30;
+  display: none; align-items: center; gap: 3px;
+  background: linear-gradient(180deg, #ff9a3d, #ff7a1a); color: #fff; font-weight: 800; font-size: 18px;
+  padding: 6px 11px 6px 8px; border-radius: 16px;
+  box-shadow: 0 5px 0 #d85e10, 0 8px 14px var(--shadow);
+}
+.combo-badge .glyph { width: 22px; height: 22px; }
+.combo-badge.is-on { display: inline-flex; }
+.combo-badge.is-pop { animation: combo-pop .36s ease; }
+@keyframes combo-pop { 0% { transform: scale(1); } 40% { transform: scale(1.28) rotate(-5deg); } 100% { transform: scale(1); } }
+
 /* progress / streak chips on the home top bar */
 .stat-chip {
   display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--ink);

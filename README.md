@@ -18,15 +18,20 @@ guides toddlers through seven bite-size learning rooms. Built as an installable
 
 ## Progression (Duolingo-style, toddler-tuned)
 
-Each room is a short **5-question lesson** with a progress bar that fills as the
-child answers. Finishing a lesson triggers a celebration that awards:
+The home screen is a **winding journey map**: each room is a "world" with a short
+path of lesson nodes that light up as they're earned (current node bobs a START
+bubble with Pip; later nodes unlock in sequence). Each lesson is a **5-question**
+run with a progress bar and **combo** encouragement ("2 in a row!") that a wrong
+tap resets. Finishing a lesson celebrates with:
 
-- **Crowns** per room (shown as a badge on each room card — "level up" feel)
-- a growing **sticker** count, and a gentle **daily streak** (parent-facing motivation)
+- a **crown** for that world (level-up feel), a **collectible sticker** (revealed
+  on the complete screen, kept in a **sticker book** of 16), and a gentle **daily streak**
+- distinct sound effects + **haptics** on every beat (silenced by the mute toggle)
 
-Progress is saved on-device (`localStorage`, `src/progress.js`) — no accounts, no
-network, no data collection. Borrowed from Duolingo's habit loop, but with **no
-hearts/lives and no fail state** — toddlers can only ever move forward.
+Pip reacts in character (happy on the map, cheering on completion). Progress is
+saved on-device (`localStorage`, `src/progress.js`) — no accounts, no network, no
+data collection. Borrowed from Duolingo's habit loop, but with **no hearts/lives
+and no fail state** — toddlers can only ever move forward.
 
 ## Designed for tiny hands (research-backed)
 

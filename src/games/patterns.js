@@ -64,6 +64,7 @@ export function patternsGame(stage, prompt, api) {
       api.reward("Yes!", round);
     } else {
       btn.classList.remove("is-wrong"); void btn.offsetWidth; btn.classList.add("is-wrong");
+      api.wrong?.();
       api.sfxTryAgain();
       api.say("Try again! Look at the pattern.");
     }

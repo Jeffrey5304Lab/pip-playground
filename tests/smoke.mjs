@@ -43,9 +43,11 @@ ok(await page.locator(".node__pip svg").count() >= 1, "Pip stands on the current
 ok(await page.locator(".stat-chip--streak").count() === 1, "map shows streak chip");
 await page.screenshot({ path: join(SHOTS, "2-map.png") });
 
+// read the bar's target percentage from inline style (resolution-independent,
+// immune to the bar resizing) rather than computed pixels
 const fillPct = () => page.evaluate(() => {
   const f = document.querySelector("#lesson-fill");
-  return f ? parseFloat(getComputedStyle(f).width) : 0;
+  return f && f.style.width ? parseFloat(f.style.width) : 0;
 });
 
 async function solve(name) {
@@ -75,8 +77,14 @@ async function solve(name) {
     const n = await tokens.count();
     for (let i = 0; i < n; i++) {
       await tokens.nth(i).click();
-      await page.waitForTimeout(380);
-      if (await fillPct() > before + 1) break;
+      try {
+        await page.waitForFunction((b) => {
+          const f = document.querySelector("#lesson-fill");
+          const done = document.querySelector(".lesson-done.is-show");
+          return !!done || (f && f.style.width && parseFloat(f.style.width) > b + 1);
+        }, before, { timeout: 800 });
+        break; // correct token registered
+      } catch { /* wrong token — try the next one */ }
     }
   }
 }
@@ -94,16 +102,19 @@ async function playLesson(idx, name) {
       await solve(name);
       await page.waitForFunction((b) => {
         const f = document.querySelector("#lesson-fill");
-        return f && parseFloat(getComputedStyle(f).width) > b + 1;
+        return f && f.style.width && parseFloat(f.style.width) > b + 1;
       }, before, { timeout: 3000 }).catch(() => {});
     } else {
       await solve(name);
+    }
+    if (name === "colors" && q === 1) {
+      ok(await page.locator(".combo-badge.is-on").count() === 1, "colors: combo badge appears on a 2+ streak");
     }
     if (q < 4) await page.waitForTimeout(820);
   }
 
   let done = true;
-  try { await page.waitForSelector(".lesson-done.is-show", { timeout: 4000 }); }
+  try { await page.waitForSelector(".lesson-done.is-show", { timeout: 5000 }); }
   catch { done = false; }
   ok(done, `${name}: lesson-complete screen shows after 5 correct`);
   if (done && idx === 0) {

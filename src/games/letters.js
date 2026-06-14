@@ -41,6 +41,7 @@ export function lettersGame(stage, prompt, api) {
       api.reward(`${target} is for ${WORD_FOR[target]}!`, round);
     } else {
       btn.classList.remove("is-wrong"); void btn.offsetWidth; btn.classList.add("is-wrong");
+      api.wrong?.();
       api.sfxTryAgain();
       api.say(`That is ${L}. Find ${target}!`);
     }

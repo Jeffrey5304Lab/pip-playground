@@ -42,6 +42,7 @@ export function shapesGame(stage, prompt, api) {
       api.reward(`${cap(target)}!`, round);
     } else {
       btn.classList.remove("is-wrong"); void btn.offsetWidth; btn.classList.add("is-wrong");
+      api.wrong?.();
       api.sfxTryAgain();
       api.say("Try again!");
     }

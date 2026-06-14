@@ -50,6 +50,7 @@ export function countingGame(stage, prompt, api) {
       api.reward(`${answer}!`, round);
     } else {
       btn.classList.remove("is-wrong"); void btn.offsetWidth; btn.classList.add("is-wrong");
+      api.wrong?.();
       api.sfxTryAgain();
       api.say("Try again! Count them.");
     }

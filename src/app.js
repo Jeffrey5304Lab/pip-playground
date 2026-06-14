@@ -10,6 +10,7 @@ import { initConfetti, burst } from "./confetti.js";
 import {
   unlockAudio, loadMutePref, setMuted, isMuted,
   say, cheer, sfxTap, sfxCorrect, sfxTryAgain, sfxCelebrate, sfxCount, sfxSticker,
+  sfxLevelUp, sfxStreak, sfxCombo, haptic,
 } from "./audio.js";
 import {
   crownsFor, totalCrowns, getState, completeLesson, addStars,
@@ -192,11 +193,12 @@ function openBook() {
 
 function openRoom(room) {
   clearGame();
-  lesson = { room, total: LESSON_LEN, done: 0 };
+  lesson = { room, total: LESSON_LEN, done: 0, combo: 0 };
   app.innerHTML = `
     <header class="topbar topbar--lesson">
       <button class="icon-btn icon-btn--close" id="home-btn" aria-label="Close lesson">${artUi.close()}</button>
       <div class="lesson-bar"><div class="lesson-fill" id="lesson-fill"></div></div>
+      <span class="combo-badge" id="combo-badge" aria-hidden="true">${artUi.flame()}<span id="combo-n">2</span></span>
     </header>
     <section class="play" style="--world:${room.color}">
       <div class="prompt"><span id="prompt-text"></span>
@@ -216,6 +218,7 @@ function openRoom(room) {
     say, sfxTap, sfxCorrect, sfxTryAgain, sfxCelebrate, sfxCount,
     rand, sample,
     reward: (label, next) => onCorrect(label, next),
+    wrong: () => onWrong(),
   };
   current = room.game($("#stage"), prompt, api);
 }
@@ -224,21 +227,45 @@ function openRoom(room) {
 function onCorrect(label, next) {
   if (!lesson) return;
   lesson.done++;
+  lesson.combo++;
   addStars(1);
+  haptic(14);
 
   const fill = $("#lesson-fill");
   if (fill) fill.style.width = `${(lesson.done / lesson.total) * 100}%`;
 
-  // games already play sfxCorrect on the correct tap; we add voice + visual juice
-  cheer(label);
+  const combo = lesson.combo;
+  updateCombo(combo);
   flashPraise(label);
-  burst(28);
+  burst(combo >= 3 ? 42 : 28);
+  // a wrong tap resets the combo, so "N in a row" is genuinely earned
+  if (combo >= 2) sfxCombo(combo);
+  cheer(combo >= 3 ? `${label} ${combo} in a row!` : label);
 
   const finished = lesson.done >= lesson.total;
   setTimeout(() => {
     if (finished) lessonComplete(lesson.room);
     else if (next) next();
   }, finished ? 650 : 700);
+}
+
+function onWrong() {
+  if (!lesson) return;
+  lesson.combo = 0;
+  updateCombo(0);
+  haptic(10);
+}
+
+function updateCombo(n) {
+  const badge = $("#combo-badge");
+  if (!badge) return;
+  if (n >= 2) {
+    $("#combo-n").textContent = n;
+    badge.classList.add("is-on");
+    badge.classList.remove("is-pop"); void badge.offsetWidth; badge.classList.add("is-pop");
+  } else {
+    badge.classList.remove("is-on", "is-pop");
+  }
 }
 
 let praiseEl = null;
@@ -295,9 +322,12 @@ function lessonComplete(room) {
 
   el.classList.add("is-show");
   burst(150);
+  haptic([0, 40, 50, 90]);
   sfxCelebrate();
+  setTimeout(sfxLevelUp, 260);                 // crown earned
+  if (earned.streakUp) setTimeout(sfxStreak, 700);
+  setTimeout(sfxSticker, 1000);                // sticker reveal shimmer
   cheer(`Lesson complete! ${isNew ? "You got a new sticker, the " + stk.name + "!" : rand(room.praise)}`);
-  setTimeout(sfxSticker, 480);
 
   $("#lesson-continue", el).onclick = () => {
     sfxTap();

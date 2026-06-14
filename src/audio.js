@@ -176,3 +176,37 @@ export function sfxSticker() {
     { f: 2093, t: 0.26, d: 0.18, type: "sine", gain: 0.16 },
   ]);
 }
+
+/** Triumphant level-up stab (major chord) for earning a crown. */
+export function sfxLevelUp() {
+  play([
+    { f: 523, t: 0, d: 0.32, type: "triangle", gain: 0.18 },
+    { f: 659, t: 0, d: 0.32, type: "triangle", gain: 0.16 },
+    { f: 784, t: 0, d: 0.34, type: "triangle", gain: 0.16 },
+    { f: 1046, t: 0.14, d: 0.3, type: "triangle", gain: 0.18 },
+  ]);
+}
+
+/** Bright "ding-ding" for a growing daily streak. */
+export function sfxStreak() {
+  play([
+    { f: 988, t: 0, d: 0.12, type: "sine", gain: 0.16 },
+    { f: 1319, t: 0.12, d: 0.18, type: "sine", gain: 0.18 },
+  ]);
+}
+
+/** Escalating "combo" blip — pitch rises with the streak length. */
+export function sfxCombo(n) {
+  const base = 660 + Math.min(n, 6) * 90;
+  play([{ f: base, t: 0, d: 0.12, type: "triangle", gain: 0.15 },
+        { f: base * 1.5, t: 0.08, d: 0.12, type: "triangle", gain: 0.13 }]);
+}
+
+/** Haptic buzz on supported devices. Silenced by mute, skipped if reduced-motion. */
+export function haptic(pattern = 12) {
+  if (muted || !("vibrate" in navigator)) return;
+  try {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    navigator.vibrate(pattern);
+  } catch (_) {}
+}
