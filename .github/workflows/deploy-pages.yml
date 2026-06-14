@@ -1,8 +1,10 @@
 name: Deploy to GitHub Pages
 
+# Manual-only for now: deployment is parked, and GitHub Pages can't publish from a
+# private repo on the free plan (the build would fail at configure-pages). Enable
+# Pages (make the repo public or upgrade) and run this from the Actions tab when
+# ready — or just use Netlify (netlify.toml) which deploys from a private repo.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
