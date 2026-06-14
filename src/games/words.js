@@ -33,7 +33,7 @@ export function wordsGame(stage, prompt, api) {
       btn.classList.remove("is-active"); void btn.offsetWidth; btn.classList.add("is-active");
       api.wrong?.();
       api.sfxTap();
-      api.say(`That's a ${name}. Find the ${target}!`);
+      api.say("Try again!");
     }
   }
 

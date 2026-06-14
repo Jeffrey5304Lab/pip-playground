@@ -43,7 +43,7 @@ export function lettersGame(stage, prompt, api) {
       btn.classList.remove("is-wrong"); void btn.offsetWidth; btn.classList.add("is-wrong");
       api.wrong?.();
       api.sfxTryAgain();
-      api.say(`That is ${L}. Find ${target}!`);
+      api.say("Try again!");
     }
   }
 

@@ -1,5 +1,5 @@
 /* sw.js — offline cache (stale-while-revalidate) for Pip's Playground. */
-const CACHE = "pip-v7";
+const CACHE = "pip-v8";
 const ASSETS = [
   "./", "./index.html", "./styles.css", "./manifest.webmanifest",
   "./src/app.js", "./src/audio.js", "./src/mascot.js", "./src/confetti.js", "./src/art.js",
@@ -7,7 +7,7 @@ const ASSETS = [
   "./src/games/colors.js", "./src/games/shapes.js",
   "./src/games/counting.js", "./src/games/animals.js",
   "./src/games/letters.js", "./src/games/words.js", "./src/games/patterns.js",
-  "./icons/icon.svg",
+  "./icons/icon.svg", "./audio/manifest.json",
 ];
 
 self.addEventListener("install", (e) => {

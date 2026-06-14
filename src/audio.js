@@ -21,6 +21,7 @@ function getCtx() {
 
 /** Must be called from a user gesture (the start button). */
 export function unlockAudio() {
+  loadVoiceManifest();
   const c = getCtx();
   if (c && c.state === "suspended") c.resume();
   // Nudge speech engine awake on iOS/Safari.
@@ -43,8 +44,43 @@ export function loadMutePref() {
 export function setMuted(value) {
   muted = value;
   localStorage.setItem(MUTE_KEY, value ? "1" : "0");
-  if (muted && "speechSynthesis" in window) window.speechSynthesis.cancel();
+  if (muted) {
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    if (curAudio) { curAudio.pause(); curAudio = null; }
+  }
 }
+
+/* ---------- Pre-generated voice clips (Gemini TTS) ----------
+   Natural narration baked at build time; falls back to the browser voice for
+   anything not in the manifest. Clips live in audio/ and are cached by the SW. */
+const CLIP_BASE = "audio/";
+let clips = null;        // { "phrase": "hash.m4a" }
+let curAudio = null;
+
+export async function loadVoiceManifest() {
+  if (clips) return;
+  try {
+    const r = await fetch(CLIP_BASE + "manifest.json", { cache: "no-cache" });
+    clips = r.ok ? ((await r.json()).clips || {}) : {};
+  } catch (_) { clips = {}; }
+}
+
+function playClip(file, onend) {
+  return new Promise((resolve) => {
+    const finish = () => { onend?.(); resolve(); };
+    try {
+      if (curAudio) { curAudio.pause(); curAudio = null; }
+      const a = new Audio(CLIP_BASE + file);
+      curAudio = a;
+      const done = () => { if (curAudio === a) curAudio = null; finish(); };
+      a.onended = done; a.onerror = done;
+      a.play().catch(done);
+    } catch (_) { finish(); }
+  });
+}
+
+// start fetching the manifest as early as possible
+loadVoiceManifest();
 
 /* ---------- Voice selection ----------
    Score English voices so we land on the warmest, highest-quality voice the
@@ -82,7 +118,16 @@ if ("speechSynthesis" in window) {
  */
 export function say(text, { rate = 0.92, pitch = 1.15, onend } = {}) {
   return new Promise((resolve) => {
-    if (muted || !("speechSynthesis" in window) || !text) { onend?.(); resolve(); return; }
+    if (muted || !text) { onend?.(); resolve(); return; }
+    // prefer the natural pre-generated clip
+    const file = clips && clips[text];
+    if (file) {
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      playClip(file, onend).then(resolve);
+      return;
+    }
+    // fallback: browser speech synthesis
+    if (!("speechSynthesis" in window)) { onend?.(); resolve(); return; }
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     if (preferredVoice) { u.voice = preferredVoice; u.lang = preferredVoice.lang; }

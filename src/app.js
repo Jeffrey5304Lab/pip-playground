@@ -240,7 +240,8 @@ function onCorrect(label, next) {
   burst(combo >= 3 ? 42 : 28);
   // a wrong tap resets the combo, so "N in a row" is genuinely earned
   if (combo >= 2) sfxCombo(combo);
-  cheer(combo >= 3 ? `${label} ${combo} in a row!` : label);
+  // standalone combo shout at a streak (its own natural clip), else the label
+  cheer(combo >= 3 ? `${combo} in a row!` : label);
 
   const finished = lesson.done >= lesson.total;
   setTimeout(() => {

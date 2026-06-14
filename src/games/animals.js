@@ -44,7 +44,7 @@ export function animalsGame(stage, prompt, api) {
       btn.classList.remove("is-active"); void btn.offsetWidth; btn.classList.add("is-active");
       api.wrong?.();
       api.sfxTap();
-      api.say(`That's a ${a.name}. Find the ${target.name}!`);
+      api.say("Try again!");
     }
   }
 
