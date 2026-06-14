@@ -80,9 +80,11 @@ npm test
 ## Roadmap
 
 **Now (game design & polish)**
-- ✅ 7 learning rooms, 100% bespoke SVG art, Duolingo-style lesson progression
-- Parent area (hold-to-enter gate), more juice/animation, richer content
-  (uppercase/lowercase matching, simple addition, story moments)
+- ✅ 7 learning rooms, 100% bespoke SVG art
+- ✅ Duolingo-style **journey map**, 5-question lessons, **combos**, crowns
+- ✅ **Sticker book** (16 collectibles), Pip **expressions**, richer SFX + **haptics**
+- Next: parent area (hold-to-enter gate), richer content (uppercase/lowercase
+  matching, simple addition, story moments), more sticker sets
 
 **Later — shipping (backlog, parked for now)**
 The plumbing is already scaffolded so we can ship whenever we choose:
