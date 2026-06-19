@@ -73,8 +73,10 @@ npm test
   theme-able, and free of the generic "AI sticker" look.
 - Design language: **Claymorphism** (soft 3D, double shadows) + **Baloo 2** type,
   per the `ui-ux-pro-max` design system.
-- Sound effects synthesized with the **Web Audio API**; voice via **SpeechSynthesis**
-  (so there are no audio asset files and it works fully offline).
+- Sound effects synthesized with the **Web Audio API**. Spoken lines play
+  pre-recorded **Gemini TTS** clips (`audio/`, voice *Leda*) for a warm, natural
+  narrator, falling back to the browser's **SpeechSynthesis** voice for anything
+  not yet recorded — both paths work fully offline once cached.
 - **Service worker** caches everything for offline play (`sw.js`).
 
 ## Roadmap
@@ -83,17 +85,19 @@ npm test
 - ✅ 7 learning rooms, 100% bespoke SVG art
 - ✅ Duolingo-style **journey map**, 5-question lessons, **combos**, crowns
 - ✅ **Sticker book** (16 collectibles), Pip **expressions**, richer SFX + **haptics**
+- ✅ Natural **Gemini TTS** voice (183 recorded clips) with browser-speech fallback
+- ✅ **Simple addition** rounds in the Numbers world (combine two groups, count all)
 - Next: parent area (hold-to-enter gate), richer content (uppercase/lowercase
-  matching, simple addition, story moments), more sticker sets
+  matching, story moments), more sticker sets
 
-**Later — shipping (backlog, parked for now)**
-The plumbing is already scaffolded so we can ship whenever we choose:
-
-- **Public URL** — `.github/workflows/deploy-pages.yml` (GitHub Pages) or
-  `netlify.toml` (free, deploys from a private repo). Both serve the output of
-  `npm run build:web` (`www/`).
-- **App Store / Play Store** — Capacitor is configured (`capacitor.config.json`,
-  app id `com.pipplayground.app`). Generate the native shells when ready:
+**Later — shipping**
+- ✅ **Public URL** — live at https://jeffrey5304lab.github.io/pip-playground/,
+  auto-deployed by `.github/workflows/deploy-pages.yml` on every push to `main`
+  (`netlify.toml` also ships, for a one-tap private deploy). Both serve the
+  output of `npm run build:web` (`www/`).
+- **App Store / Play Store** — parked. Capacitor is configured
+  (`capacitor.config.json`, app id `com.pipplayground.app`). Generate the
+  native shells when ready:
   ```bash
   npm install
   npm run cap:add:ios       # macOS + Xcode

@@ -1,7 +1,8 @@
 /* ============================================================
    audio.js — sound effects + English voice
-   No audio files: SFX are synthesized with Web Audio, and
-   speech uses the built-in SpeechSynthesis voice. Works offline.
+   SFX are synthesized with Web Audio. Speech plays a pre-recorded
+   Gemini TTS clip (audio/manifest.json) when one exists, falling back to
+   the browser's SpeechSynthesis voice otherwise. Works offline once cached.
    ============================================================ */
 
 let ctx = null;
