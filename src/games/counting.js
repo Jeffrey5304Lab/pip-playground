@@ -1,25 +1,15 @@
-/* counting.js — "How many?" Counting 1–5 with tap-to-count critters. */
+/* counting.js — "How many?" Counting 1–5, plus simple addition (count two
+   groups of the same critter together) with tap-to-count critters. */
 import { animal } from "../art.js";
 
 const CRITTERS = ["duck", "dog", "cat", "frog", "pig", "cow", "lion", "sheep"];
 
 export function countingGame(stage, prompt, api) {
   let answer = 0;
+  let counted = 0;
 
-  function round() {
-    answer = 1 + Math.floor(Math.random() * 5); // 1..5
-    const critter = api.rand(CRITTERS);
-    prompt.set(`How many?`, "How many? Tap them to count!");
-    api.say("How many? Tap them to count!");
-
-    stage.innerHTML = `
-      <div class="count-field"></div>
-      <div class="choices" style="--cols:3; margin-top:6px"></div>`;
-    const field = stage.querySelector(".count-field");
-    const opts = stage.querySelector(".choices");
-
-    let counted = 0;
-    for (let i = 0; i < answer; i++) {
+  function addCritters(field, n, critter) {
+    for (let i = 0; i < n; i++) {
       const c = document.createElement("span");
       c.className = "critter"; c.innerHTML = animal(critter); c.setAttribute("role", "button");
       c.style.animationDelay = `${i * 50}ms`;
@@ -32,8 +22,37 @@ export function countingGame(stage, prompt, api) {
       };
       field.appendChild(c);
     }
+  }
+
+  function round() {
+    counted = 0;
+    const isAdd = Math.random() < 0.5;
+    const critter = api.rand(CRITTERS);
+    prompt.set(`How many?`, "How many? Tap them to count!");
+    api.say("How many? Tap them to count!");
+
+    if (isAdd) {
+      // two small groups of the same critter — combine and count them all
+      let a, b;
+      do { a = 1 + Math.floor(Math.random() * 3); b = 1 + Math.floor(Math.random() * 3); } while (a + b > 5);
+      answer = a + b;
+      stage.innerHTML = `
+        <div class="count-field count-field--a"></div>
+        <span class="count-plus" aria-hidden="true">+</span>
+        <div class="count-field count-field--b"></div>
+        <div class="choices" style="--cols:3; margin-top:6px"></div>`;
+      addCritters(stage.querySelector(".count-field--a"), a, critter);
+      addCritters(stage.querySelector(".count-field--b"), b, critter);
+    } else {
+      answer = 1 + Math.floor(Math.random() * 5); // 1..5
+      stage.innerHTML = `
+        <div class="count-field"></div>
+        <div class="choices" style="--cols:3; margin-top:6px"></div>`;
+      addCritters(stage.querySelector(".count-field"), answer, critter);
+    }
 
     // number choices: the answer + two nearby distractors
+    const opts = stage.querySelector(".choices");
     const nums = numberChoices(answer);
     for (const n of nums) {
       const b = document.createElement("button");

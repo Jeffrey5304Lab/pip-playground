@@ -210,6 +210,10 @@ html, body {
 .critter:active { transform: scale(1.18) rotate(-6deg); }
 .critter.is-counted { animation: bop .5s ease; }
 .critter[data-done] { opacity: .96; }
+.count-plus {
+  display: block; text-align: center; font-family: inherit; font-weight: 800;
+  font-size: clamp(28px, 7vw, 40px); color: var(--ink-soft); line-height: 1;
+}
 .num-btn {
   width: var(--tap); height: var(--tap); border-radius: 28px; border: none; cursor: pointer;
   font-family: inherit; font-weight: 700; font-size: clamp(40px, 12vw, 64px); color: #fff;
