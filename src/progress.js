@@ -39,6 +39,12 @@ export function awardSticker(id) {
   return { isNew };
 }
 
+/** Wipe all saved progress (parent area "Reset" action). */
+export function resetProgress() {
+  state = defaults();
+  persist();
+}
+
 /** Call when a full lesson is finished. Returns what was earned. */
 export function completeLesson(roomId) {
   state.crowns[roomId] = (state.crowns[roomId] || 0) + 1;

@@ -281,6 +281,13 @@ export const ui = {
     <path d="M38 12 q-14 -5 -14 4 v22 q0 -8 14 -4z" fill="#ffa8d4"/>
     <path d="M24 16 v20" stroke="#e36ba2" stroke-width="2"/>
     <circle cx="16" cy="9" r="3" fill="#ffd34e"/><circle cx="33" cy="8" r="2.4" fill="#6fe39a"/>`, "sticker book"),
+  settings: () => glyph(`
+    <line x1="8" y1="14" x2="40" y2="14" stroke="#8a7560" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="19" cy="14" r="5" fill="#fff" stroke="#8a7560" stroke-width="3"/>
+    <line x1="8" y1="24" x2="40" y2="24" stroke="#8a7560" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="31" cy="24" r="5" fill="#fff" stroke="#8a7560" stroke-width="3"/>
+    <line x1="8" y1="34" x2="40" y2="34" stroke="#8a7560" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="17" cy="34" r="5" fill="#fff" stroke="#8a7560" stroke-width="3"/>`, "parent area"),
 };
 
 export function star(filled = true) {

@@ -87,8 +87,10 @@ npm test
 - ✅ **Sticker book** (16 collectibles), Pip **expressions**, richer SFX + **haptics**
 - ✅ Natural **Gemini TTS** voice (183 recorded clips) with browser-speech fallback
 - ✅ **Simple addition** rounds in the Numbers world (combine two groups, count all)
-- Next: parent area (hold-to-enter gate), richer content (uppercase/lowercase
-  matching, story moments), more sticker sets
+- ✅ **Parent area** — hold the settings icon on the map to open stats + a
+  reset-progress control (double-tap confirm)
+- Next: richer content (uppercase/lowercase matching, story moments), more
+  sticker sets
 
 **Later — shipping**
 - ✅ **Public URL** — live at https://jeffrey5304lab.github.io/pip-playground/,

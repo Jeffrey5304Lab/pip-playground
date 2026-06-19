@@ -14,7 +14,7 @@ import {
 } from "./audio.js";
 import {
   crownsFor, totalCrowns, getState, completeLesson, addStars,
-  ownsSticker, stickerCount, awardSticker,
+  ownsSticker, stickerCount, awardSticker, resetProgress,
 } from "./progress.js";
 import { colorsGame } from "./games/colors.js";
 import { shapesGame } from "./games/shapes.js";
@@ -47,6 +47,35 @@ function sample(arr, n) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; }
   return a.slice(0, n);
+}
+
+/** Require a deliberate hold (not a tap) before firing — a simple parent gate
+   a toddler won't stumble into by accident. Shows a filling pie as feedback. */
+const HOLD_MS = 1100;
+function attachHoldToOpen(btn, onComplete) {
+  let timer = null, raf = null, start = 0;
+  function tick() {
+    const t = Math.min(1, (performance.now() - start) / HOLD_MS);
+    btn.style.setProperty("--p", t);
+    if (t < 1) raf = requestAnimationFrame(tick);
+  }
+  function down(e) {
+    e.preventDefault();
+    start = performance.now();
+    btn.classList.add("is-holding");
+    raf = requestAnimationFrame(tick);
+    timer = setTimeout(() => { cancel(); onComplete(); }, HOLD_MS);
+  }
+  function cancel() {
+    clearTimeout(timer); timer = null;
+    if (raf) cancelAnimationFrame(raf);
+    btn.classList.remove("is-holding");
+    btn.style.setProperty("--p", 0);
+  }
+  btn.addEventListener("pointerdown", down);
+  btn.addEventListener("pointerup", cancel);
+  btn.addEventListener("pointerleave", cancel);
+  btn.addEventListener("pointercancel", cancel);
 }
 
 /* ---------- boot ---------- */
@@ -115,10 +144,12 @@ function goHome() {
       <span class="stat-chip stat-chip--crown">${artUi.crown()}<span>${totalCrowns()}</span></span>
       <div class="topbar__spacer"></div>
       <button class="icon-btn" id="book-btn" aria-label="Sticker book">${artUi.book()}</button>
+      <button class="icon-btn icon-btn--hold" id="parent-btn" aria-label="Hold for parent area">${artUi.settings()}</button>
     </header>
     <section class="map" id="map">${ROOMS.map((room, ri) => worldHTML(room, ri === pipRoom)).join("")}</section>`;
 
   $("#book-btn").onclick = () => { sfxTap(); openBook(); };
+  attachHoldToOpen($("#parent-btn"), () => { haptic([0, 30, 40, 60]); sfxLevelUp(); openParentArea(); });
   app.querySelectorAll(".node").forEach((node) => {
     if (node.classList.contains("is-locked")) {
       node.onclick = () => { sfxTryAgain(); node.classList.remove("is-shake"); void node.offsetWidth; node.classList.add("is-shake"); };
@@ -188,6 +219,55 @@ function openBook() {
     else slot.onclick = () => { sfxTryAgain(); };
     book.appendChild(slot);
   });
+  flashView();
+}
+
+/* ---------- parent area ---------- */
+function openParentArea() {
+  clearGame();
+  const s = getState();
+  app.innerHTML = `
+    <header class="topbar topbar--lesson">
+      <button class="icon-btn icon-btn--close" id="parent-back" aria-label="Back to map">${artUi.back()}</button>
+      <div class="title-chip"><span class="title-chip__icon">${artUi.settings()}</span>Parent Area</div>
+      <div class="topbar__spacer"></div>
+    </header>
+    <section class="parent" id="parent">
+      <div class="parent-stats">
+        ${statCard(artUi.crown(), totalCrowns(), "Crowns")}
+        ${statCard(artUi.book(), `${stickerCount()}/${STICKERS.length}`, "Stickers")}
+        ${statCard(artUi.flame(), s.streak, "Day streak")}
+      </div>
+      <div class="parent-card">
+        <p class="parent-card__text">Progress is saved only on this device — no
+          accounts, no internet connection, nothing collected.</p>
+        <button class="big-btn big-btn--danger" id="reset-btn">
+          <span class="big-btn__label">Reset All Progress</span></button>
+      </div>
+    </section>`;
+  $("#parent-back").onclick = () => { sfxTap(); goHome(); };
+
+  const resetBtn = $("#reset-btn");
+  const label = resetBtn.querySelector(".big-btn__label");
+  let confirming = false, revertTimer = null;
+  resetBtn.onclick = () => {
+    if (!confirming) {
+      confirming = true;
+      resetBtn.classList.add("is-confirm");
+      label.textContent = "Tap again to confirm";
+      sfxTryAgain();
+      revertTimer = setTimeout(() => {
+        confirming = false;
+        resetBtn.classList.remove("is-confirm");
+        label.textContent = "Reset All Progress";
+      }, 4000);
+      return;
+    }
+    clearTimeout(revertTimer);
+    resetProgress();
+    sfxTap();
+    goHome();
+  };
   flashView();
 }
 
