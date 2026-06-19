@@ -156,9 +156,9 @@ ok(errors.length === 0, "no console/page errors" + (errors.length ? ": " + error
 
 /* ---- generate PNG icons from the SVG ---- */
 console.log("\n== Icons ==");
-async function renderIcon(size, out) {
+async function renderIcon(size, out, src = "icon.svg") {
   const p = await browser.newPage({ viewport: { width: size, height: size }, deviceScaleFactor: 1 });
-  await p.setContent(`<!doctype html><html><body style="margin:0;padding:0"><img src="http://localhost:8123/icons/icon.svg" width="${size}" height="${size}"></body></html>`, { waitUntil: "networkidle" });
+  await p.setContent(`<!doctype html><html><body style="margin:0;padding:0"><img src="http://localhost:8123/icons/${src}" width="${size}" height="${size}"></body></html>`, { waitUntil: "networkidle" });
   await p.waitForTimeout(150);
   await p.screenshot({ path: join(ROOT, "icons", out), clip: { x: 0, y: 0, width: size, height: size } });
   await p.close();
@@ -166,7 +166,7 @@ async function renderIcon(size, out) {
 }
 await renderIcon(192, "icon-192.png");
 await renderIcon(512, "icon-512.png");
-await renderIcon(512, "icon-maskable-512.png");
+await renderIcon(512, "icon-maskable-512.png", "icon-maskable.svg");
 
 await browser.close();
 console.log("\n" + (fails.length ? `FAILED (${fails.length}):\n - ` + fails.join("\n - ") : "ALL PASS ✅"));
