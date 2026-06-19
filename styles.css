@@ -3,6 +3,30 @@
    Cozy claymorphism for tiny hands. Big targets, soft depth.
    ============================================================ */
 
+/* Self-hosted so the app makes zero third-party network requests — Baloo 2
+   ships as a single variable-font file; each weight below just names a
+   different instance of it, exactly like Google's own css2 API does. */
+@font-face {
+  font-family: "Baloo 2"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("fonts/baloo2-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Baloo 2"; font-style: normal; font-weight: 500; font-display: swap;
+  src: url("fonts/baloo2-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Baloo 2"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("fonts/baloo2-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Baloo 2"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("fonts/baloo2-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Baloo 2"; font-style: normal; font-weight: 800; font-display: swap;
+  src: url("fonts/baloo2-latin.woff2") format("woff2");
+}
+
 :root {
   --sky-top: #bfe9ff;
   --sky-bot: #ffe9c2;
@@ -34,7 +58,7 @@ html, body {
   margin: 0;
   height: 100%;
   overflow: hidden;
-  font-family: "Baloo 2", "Fredoka", "Quicksand", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: "Baloo 2", "Quicksand", system-ui, -apple-system, "Segoe UI", sans-serif;
   color: var(--ink);
   background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bot) 100%);
   user-select: none;
