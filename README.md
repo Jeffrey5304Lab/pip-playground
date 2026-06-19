@@ -30,8 +30,9 @@ tap resets. Finishing a lesson celebrates with:
 
 Pip reacts in character (happy on the map, cheering on completion). Progress is
 saved on-device (`localStorage`, `src/progress.js`) — no accounts, no network, no
-data collection. Borrowed from Duolingo's habit loop, but with **no hearts/lives
-and no fail state** — toddlers can only ever move forward.
+data collection (see [`privacy.html`](privacy.html)). Borrowed from Duolingo's
+habit loop, but with **no hearts/lives and no fail state** — toddlers can only
+ever move forward.
 
 ## Designed for tiny hands (research-backed)
 
@@ -111,6 +112,7 @@ npm test
 
 ```
 index.html            app shell + start gate
+privacy.html          privacy policy (linked from the in-app Parent Area)
 styles.css            visual system (claymorphism, animations)
 src/app.js            boot, router, hub, lesson engine + celebration
 src/progress.js       crowns / stickers / daily streak (localStorage)
@@ -121,7 +123,8 @@ src/confetti.js       celebration burst
 src/games/*.js        the seven learning rooms
 manifest.webmanifest  PWA manifest
 sw.js                 offline service worker
-icons/                app icons
+icons/                app icons (icon-maskable.svg has a safe-zone margin for Android)
+fonts/                self-hosted Baloo 2 (no third-party font requests)
 scripts/build-web.mjs assembles the clean www/ bundle
 capacitor.config.json native shell config (iOS/Android)
 .github/workflows/    GitHub Pages deploy

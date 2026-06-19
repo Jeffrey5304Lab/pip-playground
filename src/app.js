@@ -243,6 +243,7 @@ function openParentArea() {
           accounts, no internet connection, nothing collected.</p>
         <button class="big-btn big-btn--danger" id="reset-btn">
           <span class="big-btn__label">Reset All Progress</span></button>
+        <a class="parent-card__link" href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>
       </div>
     </section>`;
   $("#parent-back").onclick = () => { sfxTap(); goHome(); };

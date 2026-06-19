@@ -151,6 +151,27 @@ ok(Object.keys(save.crowns).length === 7, "all 7 rooms earned a crown");
 ok(save.streak === 1, `day streak started (=${save.streak})`);
 ok(Array.isArray(save.owned) && save.owned.length >= 1, `stickers persisted (=${save.owned ? save.owned.length : 0})`);
 
+console.log("\n== Parent area ==");
+await page.locator("#parent-btn").dispatchEvent("pointerdown");
+await page.waitForTimeout(150);
+await page.locator("#parent-btn").dispatchEvent("pointerup");
+await page.waitForTimeout(150);
+ok(await page.locator(".parent").count() === 0, "a short tap does not open the parent area");
+await page.locator("#parent-btn").dispatchEvent("pointerdown");
+await page.waitForTimeout(1300);
+ok(await page.locator(".parent").count() === 1, "a ~1.1s hold opens the parent area");
+await page.waitForTimeout(900); // let the staggered stat-card pop-in finish
+await page.screenshot({ path: join(SHOTS, "5-parent-area.png") });
+await page.locator("#reset-btn").click();
+await page.waitForTimeout(150);
+ok((await page.locator("#reset-btn .big-btn__label").innerText()) === "Tap again to confirm", "reset asks for a confirm tap first");
+ok(await page.locator(".parent").count() === 1, "still on the parent screen before the confirm tap");
+await page.locator("#reset-btn").click();
+await page.waitForTimeout(500);
+ok(await page.locator(".map").count() === 1, "confirming returns to the map");
+const wiped = await page.evaluate(() => JSON.parse(localStorage.getItem("pip.save.v1")));
+ok(Object.keys(wiped.crowns).length === 0 && wiped.streak === 0, "reset actually clears saved progress");
+
 console.log("\n== Console errors ==");
 ok(errors.length === 0, "no console/page errors" + (errors.length ? ": " + errors.join(" | ") : ""));
 

@@ -466,6 +466,7 @@ html, body {
   box-shadow: 0 10px 18px var(--shadow); text-align: center;
 }
 .parent-card__text { color: var(--ink-soft); font-size: 14px; line-height: 1.45; margin: 0 0 18px; }
+.parent-card__link { display: inline-block; margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: underline; }
 .big-btn--danger { background: linear-gradient(180deg,#ff8a7a,#f0543d); box-shadow: 0 10px 0 #c23a26, 0 16px 26px var(--shadow); }
 .big-btn--danger:active { box-shadow: 0 3px 0 #c23a26, 0 8px 14px var(--shadow); }
 .big-btn--danger.is-confirm { background: linear-gradient(180deg,#ff5a48,#d6321c); animation: wiggle .4s ease; }
