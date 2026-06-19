@@ -115,7 +115,7 @@ const cap = (s) => s[0].toUpperCase() + s.slice(1);
 const COLORS = ["red", "orange", "yellow", "green", "blue", "purple", "pink"];
 const SHAPES = ["circle", "square", "triangle", "star", "heart"];
 const ANIMALS = [["cow","Moo"],["dog","Woof"],["cat","Meow"],["duck","Quack"],["sheep","Baa"],["frog","Ribbit"],["lion","Roar"],["pig","Oink"]];
-const OBJECTS = ["apple","ball","car","sun","cup","fish","hat","flower"];
+const OBJECTS = ["apple","ball","car","sun","cup","fish","hat","flower","balloon","kite","moon"];
 const WORD_FOR = {A:"Apple",B:"Ball",C:"Cat",D:"Dog",E:"Egg",F:"Fish",G:"Goat",H:"Hat",I:"Igloo",J:"Jam",K:"Kite",L:"Lion",M:"Moon",N:"Nest",O:"Orange",P:"Pig",Q:"Queen",R:"Rabbit",S:"Sun",T:"Tree",U:"Umbrella",V:"Van",W:"Whale",X:"Fox",Y:"Yo-yo",Z:"Zebra"};
 const STICKERS = [...ANIMALS.map(([n]) => n), ...OBJECTS]; // ids; names are cap()
 const PRAISE = ["Great job!","Wonderful!","You did it!","Awesome!","Nice!","Yay!","Perfect!","Well done!","Hooray!","So good!","You got it!","Brilliant!","Super!","Way to go!","Lovely!","Great!","Clever!","Smart!","Amazing!"];

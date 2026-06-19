@@ -174,6 +174,23 @@ const objectArt = {
       <circle cx="45" cy="74" r="15"/><circle cx="75" cy="74" r="15"/>
     </g>
     <circle cx="60" cy="56" r="15" fill="#ffd34e"/>`, "flower"),
+  balloon: () => wrap(`
+    <ellipse cx="60" cy="52" rx="34" ry="40" fill="#ff6fae"/>
+    <path d="M52 90 L60 102 L68 90z" fill="#e85f95"/>
+    <path d="M60 102 q4 8 -2 14 q-6 6 2 12" stroke="#c79bff" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse cx="48" cy="38" rx="9" ry="14" fill="#fff" opacity="0.35"/>`, "balloon"),
+  kite: () => wrap(`
+    <path d="M60 14 L60 62 L20 62z" fill="#4cd17d"/>
+    <path d="M60 14 L60 62 L100 62z" fill="#ffd34e"/>
+    <path d="M60 110 L60 62 L20 62z" fill="#ff6b6b"/>
+    <path d="M60 110 L60 62 L100 62z" fill="#4aa8ff"/>
+    <path d="M60 14 L60 110 M20 62 L100 62" stroke="#fff" stroke-width="2" opacity="0.6"/>
+    <path d="M60 110 q4 6 -2 10 q-6 4 0 10" stroke="#8a5a2c" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M44 112 q3 1 3 5 M76 112 q-3 1 -3 5" stroke="#ff8fc8" stroke-width="3" fill="none" stroke-linecap="round"/>`, "kite"),
+  moon: () => wrap(`
+    <circle cx="64" cy="60" r="3" fill="#ffe9a8"/><circle cx="84" cy="40" r="2.2" fill="#ffe9a8"/><circle cx="40" cy="34" r="2.6" fill="#ffe9a8"/>
+    <path d="M76 24 a40 40 0 1 0 0 76 a32 32 0 1 1 0 -76z" fill="#ffd56b"/>
+    <ellipse cx="56" cy="48" rx="6" ry="9" fill="#fff" opacity="0.3"/>`, "moon"),
 };
 export function object(name) { return (objectArt[name] || objectArt.apple)(); }
 export const OBJECT_NAMES = Object.keys(objectArt);

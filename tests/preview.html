@@ -8,10 +8,11 @@ body{margin:0;background:#eef4f8;font-family:sans-serif;padding:20px;display:fle
 .dark{background:#5a4632}
 </style></head><body>
 <script type="module">
-import { animal, ANIMAL_NAMES, icon, ui, rewardArt, star } from "../src/art.js";
+import { animal, ANIMAL_NAMES, object, OBJECT_NAMES, icon, ui, rewardArt, star } from "../src/art.js";
 const root=document.body;
 function add(svg,label,dark){const d=document.createElement('div');d.className='cell'+(dark?' dark':'');d.innerHTML=svg+`<small style="${dark?'color:#fff':''}">${label}</small>`;root.appendChild(d);}
 ANIMAL_NAMES.forEach(n=>add(animal(n),n));
+OBJECT_NAMES.forEach(n=>add(object(n),n));
 Object.entries(icon).forEach(([k,f])=>add(f(),'icon:'+k));
 Object.entries(ui).forEach(([k,f])=>add(f(),'ui:'+k, k.includes('replay')));
 rewardArt.forEach((f,i)=>add(f(),'reward'+i));

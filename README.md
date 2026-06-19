@@ -25,7 +25,7 @@ run with a progress bar and **combo** encouragement ("2 in a row!") that a wrong
 tap resets. Finishing a lesson celebrates with:
 
 - a **crown** for that world (level-up feel), a **collectible sticker** (revealed
-  on the complete screen, kept in a **sticker book** of 16), and a gentle **daily streak**
+  on the complete screen, kept in a **sticker book** of 19), and a gentle **daily streak**
 - distinct sound effects + **haptics** on every beat (silenced by the mute toggle)
 
 Pip reacts in character (happy on the map, cheering on completion). Progress is
@@ -84,13 +84,13 @@ npm test
 **Now (game design & polish)**
 - ✅ 7 learning rooms, 100% bespoke SVG art
 - ✅ Duolingo-style **journey map**, 5-question lessons, **combos**, crowns
-- ✅ **Sticker book** (16 collectibles), Pip **expressions**, richer SFX + **haptics**
+- ✅ **Sticker book** (19 collectibles), Pip **expressions**, richer SFX + **haptics**
 - ✅ Natural **Gemini TTS** voice (183 recorded clips) with browser-speech fallback
 - ✅ **Simple addition** rounds in the Numbers world (combine two groups, count all)
 - ✅ **Parent area** — hold the settings icon on the map to open stats + a
   reset-progress control (double-tap confirm)
-- Next: richer content (uppercase/lowercase matching, story moments), more
-  sticker sets
+- ✅ **More stickers** — balloon, kite, moon added to the Words room + sticker book (19 total)
+- Next: richer content (uppercase/lowercase matching, story moments)
 
 **Later — shipping**
 - ✅ **Public URL** — live at https://jeffrey5304lab.github.io/pip-playground/,

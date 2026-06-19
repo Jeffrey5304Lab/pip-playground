@@ -138,7 +138,7 @@ await playLesson(6, "patterns");
 console.log("\n== Sticker book ==");
 await page.locator("#book-btn").click();
 await page.waitForTimeout(400);
-ok(await page.locator(".sticker-slot").count() === 16, "sticker book shows all 16 slots");
+ok(await page.locator(".sticker-slot").count() === 19, "sticker book shows all 19 slots");
 ok(await page.locator(".sticker-slot.is-owned").count() >= 1, "earned stickers are unlocked in the book");
 ok(await page.locator(".sticker-slot.is-locked").count() >= 1, "uncollected stickers show as locked");
 await page.screenshot({ path: join(SHOTS, "4-sticker-book.png") });
