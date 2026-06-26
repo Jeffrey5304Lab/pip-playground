@@ -195,11 +195,79 @@ const objectArt = {
 export function object(name) { return (objectArt[name] || objectArt.apple)(); }
 export const OBJECT_NAMES = Object.keys(objectArt);
 
+/* ---------------- FRUITS ---------------- */
+const fruitArt = {
+  banana: () => wrap(`
+    <path d="M28 88 C18 64 20 36 40 20 C56 8 80 12 96 28 C88 22 72 20 62 30 C48 42 46 66 54 84 C58 94 68 100 72 96 C60 106 40 104 28 88z" fill="#ffd34e"/>
+    <path d="M36 28 C28 42 26 60 30 74" fill="none" stroke="#e8c800" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+    <ellipse cx="64" cy="18" rx="12" ry="7" fill="#9a7a1a" transform="rotate(-30 64 18)"/>
+    <ellipse cx="28" cy="90" rx="12" ry="7" fill="#9a7a1a" transform="rotate(15 28 90)"/>`, "banana"),
+
+  orange: () => wrap(`
+    <circle cx="60" cy="66" r="42" fill="#ff9f43"/>
+    <path d="M52 24 C50 14 54 6 60 10 C66 6 70 14 68 24 C64 18 56 18 52 24z" fill="#4cd17d"/>
+    <path d="M60 10 L60 26" stroke="#8a5a2c" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="44" cy="54" rx="9" ry="14" fill="#ffb865" opacity="0.4"/>`, "orange"),
+
+  strawberry: () => wrap(`
+    <path d="M60 104 C38 84 18 62 22 40 C26 22 42 18 54 26 C57 18 63 18 66 26 C78 18 94 22 98 40 C102 62 82 84 60 104z" fill="#ff4040"/>
+    <path d="M54 26 C52 16 60 10 68 26" fill="none" stroke="#4cd17d" stroke-width="5" stroke-linecap="round"/>
+    <g fill="#fff8e0" opacity="0.85">
+      <ellipse cx="46" cy="52" rx="2.5" ry="4"/><ellipse cx="60" cy="46" rx="2.5" ry="4"/>
+      <ellipse cx="74" cy="52" rx="2.5" ry="4"/><ellipse cx="50" cy="70" rx="2.5" ry="4"/>
+      <ellipse cx="60" cy="66" rx="2.5" ry="4"/><ellipse cx="70" cy="70" rx="2.5" ry="4"/>
+      <ellipse cx="54" cy="84" rx="2.5" ry="4"/><ellipse cx="66" cy="84" rx="2.5" ry="4"/>
+    </g>
+    <ellipse cx="38" cy="50" rx="7" ry="12" fill="#ff7070" opacity="0.3"/>`, "strawberry"),
+
+  grape: () => wrap(`
+    <g fill="#b06bff">
+      <circle cx="60" cy="44" r="16"/><circle cx="40" cy="62" r="16"/>
+      <circle cx="80" cy="62" r="16"/><circle cx="48" cy="82" r="16"/>
+      <circle cx="72" cy="82" r="16"/><circle cx="60" cy="100" r="15"/>
+    </g>
+    <g fill="#c89bff" opacity="0.45">
+      <circle cx="54" cy="38" r="6"/><circle cx="35" cy="56" r="6"/><circle cx="75" cy="56" r="6"/>
+    </g>
+    <path d="M60 28 C58 18 54 12 50 8" stroke="#8a5a2c" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M50 8 C46 4 40 8 44 14" fill="none" stroke="#4cd17d" stroke-width="4" stroke-linecap="round"/>`, "grape"),
+
+  watermelon: () => wrap(`
+    <path d="M14 98 L60 18 L106 98z" fill="#4cd17d"/>
+    <path d="M22 98 L60 30 L98 98z" fill="#ff4040"/>
+    <path d="M30 98 L60 44 L90 98z" fill="#ff7070"/>
+    <g fill="#3d2f22">
+      <ellipse cx="50" cy="80" rx="2.5" ry="4"/><ellipse cx="60" cy="68" rx="2.5" ry="4"/>
+      <ellipse cx="70" cy="80" rx="2.5" ry="4"/><ellipse cx="44" cy="90" rx="2.5" ry="4"/>
+      <ellipse cx="60" cy="88" rx="2.5" ry="4"/><ellipse cx="76" cy="90" rx="2.5" ry="4"/>
+    </g>`, "watermelon"),
+
+  cherry: () => wrap(`
+    <path d="M60 32 C56 22 50 16 44 12" stroke="#4cd17d" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M44 12 C38 6 32 12 36 20 C38 28 36 36 30 46" stroke="#4cd17d" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M60 32 C64 40 68 48 76 54" stroke="#4cd17d" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M42 10 C48 6 56 12 50 18" fill="none" stroke="#4cd17d" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="28" cy="62" r="22" fill="#ff3d3d"/>
+    <circle cx="78" cy="66" r="22" fill="#ff3d3d"/>
+    <circle cx="22" cy="56" r="8" fill="#ff7070" opacity="0.4"/>
+    <circle cx="72" cy="60" r="8" fill="#ff7070" opacity="0.4"/>`, "cherry"),
+
+  pear: () => wrap(`
+    <ellipse cx="60" cy="76" rx="34" ry="38" fill="#a8d66b"/>
+    <ellipse cx="60" cy="40" rx="20" ry="24" fill="#bde87a"/>
+    <path d="M60 16 C60 8 56 4 52 8" stroke="#8a5a2c" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M52 8 C48 4 42 8 46 16" fill="none" stroke="#4cd17d" stroke-width="5" stroke-linecap="round"/>
+    <ellipse cx="46" cy="64" rx="7" ry="14" fill="#c8f080" opacity="0.4"/>`, "pear"),
+};
+export function fruit(name) { return (fruitArt[name] || fruitArt.banana)(); }
+export const FRUIT_NAMES = Object.keys(fruitArt);
+
 /* ---------------- COLLECTIBLE STICKERS ---------------- */
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 export const STICKERS = [
   ...ANIMAL_NAMES.map((n) => ({ id: n, name: cap(n), art: () => animal(n) })),
   ...OBJECT_NAMES.map((n) => ({ id: n, name: cap(n), art: () => object(n) })),
+  ...FRUIT_NAMES.map((n) => ({ id: n, name: cap(n), art: () => fruit(n) })),
 ];
 export function stickerArt(id) {
   const s = STICKERS.find((x) => x.id === id);
@@ -259,6 +327,51 @@ export const icon = {
     <circle cx="28" cy="86" r="13" fill="#4cd17d"/>
     <rect x="48" y="73" width="26" height="26" rx="7" fill="#ffd34e"/>
     <path d="M84 78 h16 M92 70 v16" stroke="#b06bff" stroke-width="6" stroke-linecap="round"/>`, "patterns"),
+
+  casematch: () => wrap(`
+    <rect x="12" y="34" width="46" height="46" rx="12" fill="#ff8f6b"/>
+    <rect x="62" y="42" width="46" height="46" rx="12" fill="#c89bff"/>
+    <text x="35" y="70" font-family="Baloo 2, Fredoka, sans-serif" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">A</text>
+    <text x="85" y="78" font-family="Baloo 2, Fredoka, sans-serif" font-size="30" font-weight="700" fill="#fff" text-anchor="middle">a</text>`, "casematch"),
+
+  sightwords: () => wrap(`
+    <rect x="10" y="28" width="100" height="52" rx="18" fill="#ffd34e"/>
+    <path d="M46 80 L54 96 L70 80" fill="#ffd34e"/>
+    <text x="60" y="63" font-family="Baloo 2, Fredoka, sans-serif" font-size="24" font-weight="800" fill="#8a5a1c" text-anchor="middle">THE</text>`, "sightwords"),
+
+  count10: () => wrap(`
+    <rect x="8"  y="86" width="14" height="24" rx="5" fill="#ff8f6b"/>
+    <rect x="26" y="72" width="14" height="38" rx="5" fill="#ffd34e"/>
+    <rect x="44" y="56" width="14" height="54" rx="5" fill="#6fe39a"/>
+    <rect x="62" y="40" width="14" height="70" rx="5" fill="#4aa8ff"/>
+    <rect x="80" y="22" width="14" height="88" rx="5" fill="#b06bff"/>
+    <text x="87" y="18" font-family="Baloo 2, Fredoka, sans-serif" font-size="14" font-weight="800" fill="#b06bff" text-anchor="middle">10</text>`, "count10"),
+
+  fruits: () => wrap(`
+    <circle cx="38" cy="72" r="32" fill="#ff9f43"/>
+    <path d="M30 40 C28 30 32 22 38 26 C44 22 48 30 46 40 C42 34 34 34 30 40z" fill="#4cd17d"/>
+    <path d="M38 26 L38 40" stroke="#8a5a2c" stroke-width="4" stroke-linecap="round"/>
+    <path d="M76 62 C66 44 70 24 82 18 C90 14 100 20 98 32 C94 24 84 24 80 34 C76 44 80 58 78 66z" fill="#ffd34e"/>
+    <ellipse cx="82" cy="36" rx="9" ry="6" fill="#9a7a1a" transform="rotate(-40 82 36)"/>`, "fruits"),
+
+  /* ── SUBJECT icons (home shelf — bigger, simpler reads) ── */
+  subjEnglish: () => wrap(`
+    <rect x="14" y="26" width="92" height="68" rx="16" fill="#ff9a52"/>
+    <rect x="22" y="34" width="76" height="52" rx="10" fill="#fff3da"/>
+    <text x="60" y="72" font-family="Baloo 2, Fredoka, sans-serif" font-size="32" font-weight="800" fill="#ff7a2e" text-anchor="middle">ABC</text>`, "english"),
+
+  subjColors: () => wrap(`
+    <circle cx="38" cy="44" r="20" fill="#ff6b6b"/>
+    <rect x="64" y="26" width="36" height="36" rx="9" fill="#4aa8ff"/>
+    <path d="M60 96 L40 60 Q38 56 44 56 L82 56 Q88 56 86 60z" fill="#4cd17d"/>
+    <circle cx="92" cy="86" r="13" fill="#ffd34e"/>`, "colors and shapes"),
+
+  subjAnimals: () => wrap(`
+    <ellipse cx="60" cy="80" rx="24" ry="20" fill="#ffb060"/>
+    <circle cx="30" cy="52" r="11" fill="#ffb060"/>
+    <circle cx="50" cy="34" r="11" fill="#ffb060"/>
+    <circle cx="70" cy="34" r="11" fill="#ffb060"/>
+    <circle cx="90" cy="52" r="11" fill="#ffb060"/>`, "animals and fruits"),
 };
 
 /* ---------------- UI GLYPHS (single stroke language) ---------------- */

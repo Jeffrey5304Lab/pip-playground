@@ -290,6 +290,126 @@ html, body {
 .letter-tile.is-right { animation: cheer .6s ease; }
 .letter-tile.is-wrong { animation: wiggle .4s ease; }
 
+/* Sight word tile — like letter-tile but sized for whole short words */
+.word-tile {
+  position: relative; width: var(--tap); height: var(--tap); border: none; border-radius: 28px;
+  cursor: pointer; color: #fff; background: var(--tile, #ff7a7a);
+  display: grid; place-items: center; overflow: hidden; font-family: inherit;
+  font-weight: 800; font-size: clamp(26px, 7.5vw, 40px);
+  text-shadow: 0 3px 0 rgba(0,0,0,.14);
+  box-shadow: 0 12px 0 rgba(0,0,0,.18), 0 16px 26px var(--shadow);
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.word-tile::after { content:""; position:absolute; inset:0; border-radius:inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,.4), rgba(255,255,255,0) 48%); pointer-events:none; }
+.word-tile:active { transform: translateY(7px); box-shadow: 0 3px 0 rgba(0,0,0,.18), 0 8px 12px var(--shadow); }
+.word-tile.is-right { animation: cheer .6s ease; }
+.word-tile.is-wrong { animation: wiggle .4s ease; }
+
+/* ABC Match — large target letter shown above the choice tiles */
+.match-target {
+  font-family: inherit; font-weight: 800; font-size: clamp(72px, 20vw, 100px);
+  text-align: center; line-height: 1; margin: 0 auto 4px;
+  text-shadow: 0 6px 0 rgba(0,0,0,.10), 0 8px 18px rgba(0,0,0,.12);
+  animation: pop-in .4s cubic-bezier(.18,1.4,.4,1) both;
+}
+
+/* Subtraction — cross out critters that are "taken away" */
+.critter.is-crossed { opacity: 0.28; filter: grayscale(60%); position: relative; }
+.critter.is-crossed::after {
+  content: "✕"; position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: clamp(36px, 10vw, 54px); color: #ff3333; font-weight: 900; opacity: 1;
+  text-shadow: 0 2px 6px rgba(0,0,0,.25); filter: none;
+}
+
+/* ---------- Home hero strip ---------- */
+.home-hero {
+  display: flex; align-items: center; gap: 10px; flex: none;
+  background: var(--card); border-radius: 20px; padding: 8px 18px 8px 8px; margin-bottom: 6px;
+  box-shadow: 0 6px 0 rgba(180,150,110,.2), 0 10px 18px var(--shadow);
+}
+.home-hero__pip { width: 52px; height: 52px; flex: none; animation: bob-soft 2.8s ease-in-out infinite; }
+.home-hero__msg { font-size: clamp(18px, 5vw, 22px); font-weight: 700; color: var(--ink); }
+
+/* ---------- Game / subject grids ---------- */
+.room-grid, .subject-grid {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding: 0 2px 44px;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+  align-content: start;
+}
+.room-grid::-webkit-scrollbar, .subject-grid::-webkit-scrollbar { display: none; }
+
+/* Subject shelf cards sit a touch taller & roomier than game cards */
+.subject-card { min-height: 168px; justify-content: center; gap: 12px; }
+.subject-card__sub {
+  font-size: 12px; font-weight: 800; letter-spacing: .3px; color: #fff; opacity: .92;
+  text-shadow: 0 1px 3px rgba(0,0,0,.28); z-index: 4;
+}
+.room-card__icon--big { width: 96px; height: 96px; border-radius: 28px; padding: 12px; }
+
+/* ── Cozy clay card (matches the app's claymorphism — matte, no glare) ── */
+.room-card {
+  background: var(--world);
+  border: none; border-radius: 30px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 16px 10px 18px; gap: 9px; min-height: 196px;
+  box-shadow: 0 10px 0 color-mix(in srgb, var(--world) 60%, #000 24%), 0 16px 26px var(--shadow);
+  transition: transform .1s ease, box-shadow .1s ease;
+  position: relative; overflow: hidden;
+}
+/* one soft static highlight along the top — the gentle clay sheen, not a glare */
+.room-card::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,0) 44%);
+}
+.room-card:active {
+  transform: translateY(7px);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--world) 60%, #000 24%), 0 8px 14px var(--shadow);
+}
+
+/* Completed: a calm static gold ring — no pulsing, no glare */
+.room-card.is-complete {
+  box-shadow: 0 10px 0 color-mix(in srgb, var(--world) 60%, #000 24%), 0 16px 26px var(--shadow),
+              inset 0 0 0 3px #ffd86b;
+}
+
+/* Stars */
+.room-card__stars { display: flex; gap: 4px; z-index: 2; }
+.room-card__stars .star-glyph { width: 22px; height: 22px; filter: drop-shadow(0 2px 2px rgba(120,90,50,.28)); }
+
+/* White icon tile — matte clay, soft */
+.room-card__icon {
+  width: 82px; height: 82px; background: var(--card); border-radius: 24px;
+  display: grid; place-items: center; padding: 10px; flex: none; z-index: 2;
+  box-shadow: 0 5px 0 rgba(150,120,80,.18), inset 0 2px 0 rgba(255,255,255,.7);
+}
+.room-card__icon .art { width: 100%; height: 100%; }
+
+/* Name — soft frosted pill */
+.room-card__name {
+  background: rgba(255,255,255,.2); color: #fff; font-weight: 800;
+  font-size: clamp(13px, 3.6vw, 16px); padding: 5px 16px; border-radius: 18px;
+  text-shadow: 0 2px 3px rgba(0,0,0,.22); z-index: 2;
+  letter-spacing: .2px; text-align: center;
+}
+
+/* NEW / Done badges */
+.room-card__badge {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  font-family: inherit; font-weight: 800; font-size: 11px; letter-spacing: .6px;
+  padding: 4px 10px; border-radius: 12px; line-height: 1;
+}
+.room-card__badge--new {
+  background: var(--card); color: var(--world);
+  box-shadow: 0 3px 0 rgba(150,120,80,.22);
+}
+.room-card__badge--done {
+  background: rgba(255,216,107,.25); border: 1.5px solid rgba(255,216,107,.6);
+  color: #fff; display: flex; align-items: center; gap: 3px;
+}
+.room-card__badge--done .glyph { width: 13px; height: 13px; }
+
 /* Patterns */
 .pattern-row {
   display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center;

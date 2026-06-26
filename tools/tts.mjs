@@ -149,6 +149,26 @@ function buildPhrases() {
   STICKERS.forEach((n) => s.add(`Lesson complete! You got a new sticker, the ${cap(n)}!`));
   // sticker book taps
   STICKERS.forEach((n) => s.add(cap(n)));
+
+  /* ---- new content: ABC Match, Sight Words, Count to 10, Fruits, Subjects ---- */
+  const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  LETTERS.forEach((L) => {
+    s.add(`Find the little ${L.toLowerCase()}.`);
+    s.add(`Find the big letter ${L}.`);
+    s.add(`${L} and ${L.toLowerCase()}!`);
+  });
+  const SIGHT = ["the","I","see","we","can","go","is","it","a","at","in","no","up","my","to","do","he","she","me","and","for","on","run","big","red","you","one","two","play","help"];
+  SIGHT.forEach((w) => { s.add(`Find the word ${w}!`); s.add(`${w}!`); });
+  [1,2,3].forEach((n) => s.add(`Take away ${n}. How many are left?`));
+  [6,7,8,9,10].forEach((n) => { s.add(`${n}!`); s.add(`${n}`); });
+  const FRUITS = ["banana","orange","strawberry","grape","watermelon","cherry","pear"];
+  FRUITS.forEach((f) => { s.add(`Find the ${f}!`); s.add(`${cap(f)}!`); });
+  // subject shelf prompts
+  s.add("Pick a subject!");
+  ["English","Numbers","Colors & Shapes","Animals & Fruits"].forEach((sub) => s.add(`${sub}! Pick a game!`));
+  // new fruit stickers (reveal line + book taps)
+  FRUITS.forEach((f) => { s.add(`Lesson complete! You got a new sticker, the ${cap(f)}!`); s.add(cap(f)); });
+
   return [...s];
 }
 

@@ -23,6 +23,10 @@ import { animalsGame } from "./games/animals.js";
 import { lettersGame } from "./games/letters.js";
 import { wordsGame } from "./games/words.js";
 import { patternsGame } from "./games/patterns.js";
+import { casematchGame } from "./games/casematch.js";
+import { sightwordsGame } from "./games/sightwords.js";
+import { count10Game } from "./games/count10.js";
+import { fruitsGame } from "./games/fruits.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const LESSON_LEN = 5;
@@ -34,12 +38,27 @@ const ROOMS = [
   { id: "animals", label: "Animals", icon: artIcon.animals, cls: "room--animals", color: "#a25dff", game: animalsGame,  praise: ["Yay!", "So good!", "You got it!"] },
   { id: "letters", label: "ABC",     icon: artIcon.letters, cls: "room--letters", color: "#ff9233", game: lettersGame,  praise: ["Brilliant!", "Super!", "Way to go!"] },
   { id: "words",   label: "Words",   icon: artIcon.words,   cls: "room--words",   color: "#ff6fae", game: wordsGame,    praise: ["Lovely!", "Great!", "You did it!"] },
-  { id: "pattern", label: "Patterns",icon: artIcon.patterns,cls: "room--pattern", color: "#28b8b0", game: patternsGame, praise: ["Clever!", "Smart!", "Amazing!"] },
+  { id: "pattern",   label: "Patterns",   icon: artIcon.patterns,   cls: "room--pattern",   color: "#28b8b0", game: patternsGame,   praise: ["Clever!", "Smart!", "Amazing!"] },
+  { id: "casematch", label: "ABC Match",  icon: artIcon.casematch,  cls: "room--casematch", color: "#c25be8", game: casematchGame,  praise: ["Perfect match!", "You got it!", "Brilliant!"] },
+  { id: "sightwords",label: "Sight Words",icon: artIcon.sightwords, cls: "room--sightwords",color: "#1ab8a0", game: sightwordsGame, praise: ["Good reading!", "You can read!", "Amazing!"] },
+  { id: "count10",   label: "Count to 10",icon: artIcon.count10,   cls: "room--count10",   color: "#2563eb", game: count10Game,   praise: ["You counted it!", "Perfect!", "So smart!"] },
+  { id: "fruits",    label: "Fruits",     icon: artIcon.fruits,    cls: "room--fruits",    color: "#f7921c", game: fruitsGame,    praise: ["Yummy!", "That's right!", "Great job!"] },
 ];
 
 const NODES_PER_WORLD = 3;
 
-let app, soundBtn, current = null, lesson = null;
+/* Subjects group the rooms into a few big, parent-recognisable shelves.
+   The home screen shows these; tapping one reveals its games. No locks —
+   every game is always free to play. */
+const SUBJECTS = [
+  { id: "english", label: "English",          color: "#ff9233", icon: artIcon.subjEnglish, rooms: ["letters", "words", "casematch", "sightwords"] },
+  { id: "numbers", label: "Numbers",          color: "#34c46e", icon: artIcon.numbers,     rooms: ["count", "count10"] },
+  { id: "colors",  label: "Colors & Shapes",  color: "#3d8bff", icon: artIcon.subjColors,  rooms: ["colors", "shapes", "pattern"] },
+  { id: "nature",  label: "Animals & Fruits", color: "#a25dff", icon: artIcon.subjAnimals, rooms: ["animals", "fruits"] },
+];
+const subjRooms = (subj) => subj.rooms.map((id) => ROOMS.find((r) => r.id === id));
+
+let app, soundBtn, current = null, lesson = null, currentSubject = null;
 
 /* ---------- helpers passed to games ---------- */
 const rand = (arr) => arr[(Math.random() * arr.length) | 0];
@@ -116,80 +135,97 @@ function clearGame() { if (current && current.destroy) current.destroy(); curren
 /** Re-trigger the view-enter transition on the freshly painted screen. */
 function flashView() { app.classList.remove("view-enter"); void app.offsetWidth; app.classList.add("view-enter"); }
 
-/** Subtle parallax: drift the sky scenery as the map scrolls. */
-function attachParallax(scroller) {
-  const sky = $(".sky");
-  if (!sky || !scroller || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  let ticking = false;
-  scroller.addEventListener("scroll", () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      sky.style.transform = `translateY(${scroller.scrollTop * -0.06}px)`;
-      ticking = false;
-    });
-  }, { passive: true });
-}
-
+/* ---------- home: the subject shelf ---------- */
 function goHome() {
   clearGame();
-  say("Pick a game!");
-  const s = getState();
-  // first world that still has a lesson to do — that's where Pip waits
-  const pipRoom = ROOMS.findIndex((r) => crownsFor(r.id) < NODES_PER_WORLD);
+  currentSubject = null;
+  say("Pick a subject!");
 
   app.innerHTML = `
     <header class="topbar topbar--home">
-      <span class="stat-chip stat-chip--streak">${artUi.flame()}<span>${s.streak}</span></span>
-      <span class="stat-chip stat-chip--crown">${artUi.crown()}<span>${totalCrowns()}</span></span>
       <div class="topbar__spacer"></div>
       <button class="icon-btn" id="book-btn" aria-label="Sticker book">${artUi.book()}</button>
       <button class="icon-btn icon-btn--hold" id="parent-btn" aria-label="Hold for parent area">${artUi.settings()}</button>
     </header>
-    <section class="map" id="map">${ROOMS.map((room, ri) => worldHTML(room, ri === pipRoom)).join("")}</section>`;
+    <div class="home-hero">
+      <span class="home-hero__pip">${pipSVG({ size: 52 })}</span>
+      <span class="home-hero__msg">Pick a game!</span>
+    </div>
+    <section class="subject-grid" id="subject-grid">
+      ${SUBJECTS.map(subjectCardHTML).join("")}
+    </section>`;
 
   $("#book-btn").onclick = () => { sfxTap(); openBook(); };
   attachHoldToOpen($("#parent-btn"), () => { haptic([0, 30, 40, 60]); sfxLevelUp(); openParentArea(); });
-  app.querySelectorAll(".node").forEach((node) => {
-    if (node.classList.contains("is-locked")) {
-      node.onclick = () => { sfxTryAgain(); node.classList.remove("is-shake"); void node.offsetWidth; node.classList.add("is-shake"); };
-      return;
-    }
-    const room = ROOMS.find((r) => r.id === node.dataset.room);
-    node.onclick = () => { sfxTap(); openRoom(room); };
+  app.querySelectorAll(".subject-card").forEach((card) => {
+    const subj = SUBJECTS.find((s) => s.id === card.dataset.subject);
+    card.onclick = () => { sfxTap(); openSubject(subj); };
   });
 
-  // scroll Pip's world into view so the journey starts where the child left off
-  const here = app.querySelector(".node.is-current");
-  if (here) here.scrollIntoView({ block: "center" });
-  attachParallax($("#map"));
   flashView();
 }
 
-function worldHTML(room, hasPip) {
-  const done = crownsFor(room.id);
-  let nodes = "";
-  for (let i = 0; i < NODES_PER_WORLD; i++) {
-    const state = i < done ? "is-done" : i === done ? "is-current" : "is-locked";
-    const face = state === "is-done" ? artUi.crown() : state === "is-current" ? artUi.play() : artUi.lock();
-    const showPip = hasPip && state === "is-current";
-    nodes += `
-      <button class="node ${state}" data-room="${room.id}" data-node="${i}" style="--world:${room.color}"
-              aria-label="${room.label} lesson ${i + 1}${state === "is-locked" ? " locked" : ""}">
-        ${state === "is-current" ? `<span class="node__start">START</span>` : ""}
-        <span class="node__face">${face}</span>
-        ${showPip ? `<span class="node__pip">${pipSVG({ size: 78 })}</span>` : ""}
-      </button>`;
-  }
+function subjectCardHTML(subj) {
+  const rooms = subjRooms(subj);
+  const total = rooms.length * NODES_PER_WORLD;
+  const done  = rooms.reduce((a, r) => a + Math.min(crownsFor(r.id), NODES_PER_WORLD), 0);
+  const isDone = done >= total;
+  const badge = isDone ? `<span class="room-card__badge room-card__badge--done">${artUi.crown()}Done!</span>` : "";
   return `
-    <section class="world" data-room="${room.id}" style="--world:${room.color}">
-      <div class="world__banner">
-        <span class="world__icon">${room.icon()}</span>
-        <span class="world__name">${room.label}</span>
-        <span class="world__crowns">${artUi.crown()}<span>${Math.min(done, NODES_PER_WORLD)}/${NODES_PER_WORLD}</span></span>
-      </div>
-      <div class="world__path">${nodes}</div>
+    <button class="room-card subject-card${isDone ? " is-complete" : ""}" data-subject="${subj.id}"
+            style="--world:${subj.color}" aria-label="${subj.label}, ${rooms.length} games">
+      ${badge}
+      <div class="room-card__icon room-card__icon--big">${subj.icon()}</div>
+      <div class="room-card__name">${subj.label}</div>
+      <div class="subject-card__sub">${rooms.length} games</div>
+    </button>`;
+}
+
+/* ---------- inside a subject: pick a game ---------- */
+function openSubject(subj) {
+  clearGame();
+  currentSubject = subj;
+  say(`${subj.label}! Pick a game!`);
+  const rooms = subjRooms(subj);
+
+  app.innerHTML = `
+    <header class="topbar topbar--lesson">
+      <button class="icon-btn icon-btn--close" id="subj-back" aria-label="Back to subjects">${artUi.back()}</button>
+      <div class="title-chip"><span class="title-chip__icon">${subj.icon()}</span>${subj.label}</div>
+      <div class="topbar__spacer"></div>
+    </header>
+    <section class="room-grid" id="room-grid" style="--world:${subj.color}">
+      ${rooms.map(roomCardHTML).join("")}
     </section>`;
+
+  $("#subj-back").onclick = () => { sfxTap(); goHome(); };
+  app.querySelectorAll(".room-card").forEach((card) => {
+    const room = ROOMS.find((r) => r.id === card.dataset.room);
+    card.onclick = () => { sfxTap(); openRoom(room); };
+  });
+
+  flashView();
+}
+
+/** Return from a finished/closed lesson to wherever the child was browsing. */
+function backToBrowse() { if (currentSubject) openSubject(currentSubject); else goHome(); }
+
+function roomCardHTML(room) {
+  const done = Math.min(crownsFor(room.id), NODES_PER_WORLD);
+  const isNew   = done === 0;
+  const isDone  = done >= NODES_PER_WORLD;
+  const stars   = Array.from({ length: NODES_PER_WORLD }, (_, i) => artStar(i < done)).join("");
+  const badge   = isNew  ? `<span class="room-card__badge room-card__badge--new">NEW</span>`
+                : isDone ? `<span class="room-card__badge room-card__badge--done">${artUi.crown()}Done!</span>`
+                : "";
+  return `
+    <button class="room-card${isDone ? " is-complete" : ""}" data-room="${room.id}"
+            style="--world:${room.color}" aria-label="${room.label}">
+      ${badge}
+      <div class="room-card__stars">${stars}</div>
+      <div class="room-card__icon">${room.icon()}</div>
+      <div class="room-card__name">${room.label}</div>
+    </button>`;
 }
 
 /* ---------- sticker book ---------- */
@@ -287,7 +323,7 @@ function openRoom(room) {
       </div>
       <div class="stage" id="stage"></div>
     </section>`;
-  $("#home-btn").onclick = () => { sfxTap(); goHome(); };
+  $("#home-btn").onclick = () => { sfxTap(); backToBrowse(); };
   flashView();
 
   const promptText = $("#prompt-text");
@@ -414,7 +450,7 @@ function lessonComplete(room) {
   $("#lesson-continue", el).onclick = () => {
     sfxTap();
     el.classList.remove("is-show");
-    goHome();
+    backToBrowse();
   };
 }
 
