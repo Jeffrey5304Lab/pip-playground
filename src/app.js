@@ -383,11 +383,14 @@ function onCorrect(label, next) {
   // standalone combo shout at a streak (its own natural clip), else the label
   cheer(combo >= 3 ? `${combo} in a row!` : label);
 
+  // In bilingual mode the spoken reward is "中文！English!" (~1.7s); give it room
+  // to finish before the next prompt cancels it, so the reinforcement is heard.
   const finished = lesson.done >= lesson.total;
+  const gap = finished ? 650 : (isBilingual() ? 1150 : 700);
   setTimeout(() => {
     if (finished) lessonComplete(lesson.room);
     else if (next) next();
-  }, finished ? 650 : 700);
+  }, gap);
 }
 
 function onWrong() {

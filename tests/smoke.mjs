@@ -28,7 +28,11 @@ const browser = await chromium.launch({
   executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
 });
 const page = await browser.newPage({ viewport: { width: 414, height: 896 }, deviceScaleFactor: 2 });
-await page.addInitScript(() => { try { localStorage.clear(); } catch (_) {} });
+// Fresh slate; pin bilingual OFF so the lesson walk-through uses the fast,
+// deterministic timing (the toggle itself is asserted separately below).
+await page.addInitScript(() => {
+  try { localStorage.clear(); localStorage.setItem("pip.bilingual", "0"); } catch (_) {}
+});
 
 const errors = [];
 page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
