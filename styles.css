@@ -587,6 +587,25 @@ html, body {
 }
 .parent-card__text { color: var(--ink-soft); font-size: 14px; line-height: 1.45; margin: 0 0 18px; }
 .parent-card__link { display: inline-block; margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: underline; }
+
+/* setting row with a toggle */
+.parent-card--setting { text-align: left; padding: clamp(14px, 4vw, 20px); }
+.setting-row { display: flex; align-items: center; gap: 14px; }
+.setting-row__text { flex: 1; }
+.setting-row__title { font-size: 16px; font-weight: 700; color: var(--ink); }
+.setting-row__sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.35; }
+.toggle {
+  flex: none; width: 60px; height: 34px; border: none; border-radius: 18px; cursor: pointer;
+  background: #d9cdba; position: relative; transition: background .2s ease;
+  box-shadow: inset 0 2px 4px rgba(120,90,50,.2);
+}
+.toggle::after {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 28px; height: 28px;
+  border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.25);
+  transition: transform .2s cubic-bezier(.4,1.4,.5,1);
+}
+.toggle.is-on { background: #4cd17d; }
+.toggle.is-on::after { transform: translateX(26px); }
 .big-btn--danger { background: linear-gradient(180deg,#ff8a7a,#f0543d); box-shadow: 0 10px 0 #c23a26, 0 16px 26px var(--shadow); }
 .big-btn--danger:active { box-shadow: 0 3px 0 #c23a26, 0 8px 14px var(--shadow); }
 .big-btn--danger.is-confirm { background: linear-gradient(180deg,#ff5a48,#d6321c); animation: wiggle .4s ease; }

@@ -26,15 +26,17 @@ console.log(`using ${KEYS.length} API key(s)`);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const STYLE = "Read aloud in a warm, friendly, gentle and cheerful voice for a happy three-year-old: ";
+const STYLE_ZH = "用溫暖、親切、溫柔又開心的聲音，慢慢地念給三歲小朋友聽：";
+const isZh = (t) => /[㐀-鿿]/.test(t);
 
-async function ttsOnce(text, voiceName, key) {
+async function ttsOnce(text, voiceName, key, style = STYLE) {
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${key}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: STYLE + text }] }],
+        contents: [{ parts: [{ text: style + text }] }],
         generationConfig: {
           responseModalities: ["AUDIO"],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
@@ -57,14 +59,14 @@ async function ttsOnce(text, voiceName, key) {
    blips (free-project keys have a low per-minute limit). Throws only after many
    attempts across all keys — which we treat as the daily quota being gone. */
 let rr = 0;
-export async function tts(text, voiceName) {
+export async function tts(text, voiceName, style = STYLE) {
   const maxAttempts = Math.max(8, KEYS.length * 4);
   const start = rr++; // rotate which key leads, so successes spread across keys
   let lastErr;
   for (let a = 0; a < maxAttempts; a++) {
     const key = KEYS[(start + a) % KEYS.length];
     try {
-      return await ttsOnce(text, voiceName, key);
+      return await ttsOnce(text, voiceName, key, style);
     } catch (e) {
       lastErr = e;
       if (a === maxAttempts - 1) break;
@@ -110,6 +112,7 @@ async function samples() {
 import { createHash } from "crypto";
 import { execFileSync } from "child_process";
 import { rmSync } from "fs";
+import { ZH_PHRASES } from "../src/i18n.js";
 
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 const COLORS = ["red", "orange", "yellow", "green", "blue", "purple", "pink"];
@@ -169,6 +172,9 @@ function buildPhrases() {
   // new fruit stickers (reveal line + book taps)
   FRUITS.forEach((f) => { s.add(`Lesson complete! You got a new sticker, the ${cap(f)}!`); s.add(cap(f)); });
 
+  // Chinese guidance lines (bilingual mode)
+  ZH_PHRASES.forEach((z) => s.add(z));
+
   return [...s];
 }
 
@@ -192,7 +198,7 @@ async function generateAll(voice) {
     // 1) synthesize (tts() already rotates keys + backs off through transient limits)
     let pcm;
     try {
-      pcm = await tts(text, voice);
+      pcm = await tts(text, voice, isZh(text) ? STYLE_ZH : STYLE);
       consec = 0;
     } catch (e) {
       console.error(`  TTS FAILED ${JSON.stringify(text)}: ${e.message.slice(0, 60)}`);

@@ -5,12 +5,17 @@
    the browser's SpeechSynthesis voice otherwise. Works offline once cached.
    ============================================================ */
 
+import { ZH } from "./i18n.js";
+
 let ctx = null;
 let muted = false;
 let unlocked = false;
 let preferredVoice = null;
+let zhVoice = null;
+let bilingual = true;          // Chinese guidance + English word (default on)
 
 const MUTE_KEY = "pip.muted";
+const BILINGUAL_KEY = "pip.bilingual";
 
 function getCtx() {
   if (!ctx) {
@@ -40,6 +45,20 @@ export function isMuted() { return muted; }
 export function loadMutePref() {
   muted = localStorage.getItem(MUTE_KEY) === "1";
   return muted;
+}
+
+/* ---- bilingual (Chinese guidance) preference ---- */
+export function isBilingual() { return bilingual; }
+export function loadBilingualPref() {
+  const v = localStorage.getItem(BILINGUAL_KEY);
+  bilingual = v === null ? true : v === "1";   // default on
+  return bilingual;
+}
+export function setBilingual(value) {
+  bilingual = value;
+  localStorage.setItem(BILINGUAL_KEY, value ? "1" : "0");
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  if (curAudio) { curAudio.pause(); curAudio = null; }
 }
 
 export function setMuted(value) {
@@ -107,31 +126,64 @@ function pickVoice() {
   const pool = en.length ? en : voices;
   return pool.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] || null;
 }
+/** Best Mandarin voice for the browser fallback (clips are preferred when present). */
+function pickZhVoice() {
+  if (!("speechSynthesis" in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  const zh = voices.filter((v) => /^(zh|cmn)(-|_|$)/i.test(v.lang));
+  if (!zh.length) return null;
+  // prefer Taiwan/enhanced female voices (Mei-Jia, Tingting…)
+  const score = (v) => {
+    let s = 0; const n = v.name.toLowerCase();
+    if (/premium|enhanced|neural/.test(n)) s += 40;
+    if (/mei-?jia|tingting|sin-?ji|li-?mu|yu-?shu/.test(n)) s += 20;
+    if (/zh-tw|zh_tw/i.test(v.lang)) s += 10; else if (/zh-cn|zh_cn|cmn/i.test(v.lang)) s += 6;
+    return s;
+  };
+  return zh.slice().sort((a, b) => score(b) - score(a))[0] || null;
+}
+const hasCJK = (t) => /[㐀-鿿豈-﫿]/.test(t);
 
 if ("speechSynthesis" in window) {
   preferredVoice = pickVoice();
-  window.speechSynthesis.onvoiceschanged = () => { preferredVoice = pickVoice(); };
+  zhVoice = pickZhVoice();
+  window.speechSynthesis.onvoiceschanged = () => { preferredVoice = pickVoice(); zhVoice = pickZhVoice(); };
 }
 
 /**
  * Speak an English phrase warmly and slowly for little ears.
  * @returns {Promise<void>} resolves when speech ends (or immediately if muted)
  */
-export function say(text, { rate = 0.92, pitch = 1.15, onend } = {}) {
+export function say(text, opts = {}) {
+  if (muted || !text) { opts.onend?.(); return Promise.resolve(); }
+  // Bilingual: speak the Chinese guidance first, then the English word.
+  if (bilingual && ZH[text]) {
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    return sayOne(ZH[text], { rate: 0.96, pitch: 1.12 }).then(() => sayOne(text, opts));
+  }
+  return sayOne(text, opts);
+}
+
+/** Speak a single phrase (auto-detects Chinese vs English for the fallback voice). */
+function sayOne(text, { rate = 0.92, pitch = 1.15, onend } = {}) {
   return new Promise((resolve) => {
     if (muted || !text) { onend?.(); resolve(); return; }
-    // prefer the natural pre-generated clip
+    // prefer the natural pre-generated clip (works for both languages)
     const file = clips && clips[text];
     if (file) {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       playClip(file, onend).then(resolve);
       return;
     }
-    // fallback: browser speech synthesis
+    // fallback: browser speech synthesis, in the right language
     if (!("speechSynthesis" in window)) { onend?.(); resolve(); return; }
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    if (preferredVoice) { u.voice = preferredVoice; u.lang = preferredVoice.lang; }
+    const zh = hasCJK(text);
+    if (zh && zhVoice) { u.voice = zhVoice; u.lang = zhVoice.lang; }
+    else if (zh) { u.lang = "zh-TW"; }
+    else if (preferredVoice) { u.voice = preferredVoice; u.lang = preferredVoice.lang; }
     else u.lang = "en-US";
     u.rate = rate; u.pitch = pitch; u.volume = 1;
     const done = () => { onend?.(); resolve(); };

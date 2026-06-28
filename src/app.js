@@ -9,6 +9,7 @@ import { icon as artIcon, ui as artUi, star as artStar, STICKERS, stickerArt, st
 import { initConfetti, burst } from "./confetti.js";
 import {
   unlockAudio, loadMutePref, setMuted, isMuted,
+  loadBilingualPref, isBilingual, setBilingual,
   say, cheer, sfxTap, sfxCorrect, sfxTryAgain, sfxCelebrate, sfxCount, sfxSticker,
   sfxLevelUp, sfxStreak, sfxCombo, haptic,
 } from "./audio.js";
@@ -106,6 +107,7 @@ function boot() {
   soundBtn.innerHTML = `<span class="sound-toggle__on">${artUi.speakerOn()}</span>` +
                        `<span class="sound-toggle__off">${artUi.speakerOff()}</span>`;
   loadMutePref();
+  loadBilingualPref();
   reflectMute();
 
   $("#start-btn").addEventListener("click", start, { once: true });
@@ -274,6 +276,16 @@ function openParentArea() {
         ${statCard(artUi.book(), `${stickerCount()}/${STICKERS.length}`, "Stickers")}
         ${statCard(artUi.flame(), s.streak, "Day streak")}
       </div>
+      <div class="parent-card parent-card--setting">
+        <div class="setting-row">
+          <div class="setting-row__text">
+            <div class="setting-row__title">中文引導 · Chinese guidance</div>
+            <div class="setting-row__sub">先用中文說明，再念英文單字（適合學齡前）</div>
+          </div>
+          <button class="toggle" id="bilingual-toggle" role="switch"
+                  aria-label="Chinese guidance" aria-checked="${isBilingual()}"></button>
+        </div>
+      </div>
       <div class="parent-card">
         <p class="parent-card__text">Progress is saved only on this device — no
           accounts, no internet connection, nothing collected.</p>
@@ -283,6 +295,17 @@ function openParentArea() {
       </div>
     </section>`;
   $("#parent-back").onclick = () => { sfxTap(); goHome(); };
+
+  const biToggle = $("#bilingual-toggle");
+  biToggle.classList.toggle("is-on", isBilingual());
+  biToggle.onclick = () => {
+    const next = !isBilingual();
+    setBilingual(next);
+    biToggle.classList.toggle("is-on", next);
+    biToggle.setAttribute("aria-checked", String(next));
+    sfxTap();
+    if (next) say("Find the red one!");   // a quick taste of the bilingual voice
+  };
 
   const resetBtn = $("#reset-btn");
   const label = resetBtn.querySelector(".big-btn__label");
