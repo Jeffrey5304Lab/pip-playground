@@ -67,7 +67,7 @@ export const ZH = {
   "Who says Moo? Find the cow!": "誰會哞哞叫？找牛牛！",
   "Who says Woof? Find the dog!": "誰會汪汪叫？找狗狗！",
   "Who says Meow? Find the cat!": "誰會喵喵叫？找貓咪！",
-  "Who says Quack? Find the duck!": "誰會呱呱叫？找鴨鴨！",
+  "Who says Quack? Find the duck!": "誰會嘎嘎叫？找鴨鴨！",
   "Who says Baa? Find the sheep!": "誰會咩咩叫？找綿羊！",
   "Who says Ribbit? Find the frog!": "誰會呱呱叫？找青蛙！",
   "Who says Roar? Find the lion!": "誰會吼吼叫？找獅子！",

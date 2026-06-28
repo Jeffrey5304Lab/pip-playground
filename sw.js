@@ -1,5 +1,5 @@
 /* sw.js — offline cache (stale-while-revalidate) for Pip's Playground. */
-const CACHE = "pip-v20";
+const CACHE = "pip-v21";
 const ASSETS = [
   "./", "./index.html", "./styles.css", "./manifest.webmanifest",
   "./src/app.js", "./src/audio.js", "./src/mascot.js", "./src/confetti.js", "./src/art.js",
