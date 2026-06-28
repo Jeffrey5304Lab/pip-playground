@@ -137,6 +137,8 @@ async function playRoom(room, captureSticker = false) {
   if (done && captureSticker) {
     ok(await page.locator(".sticker-reveal__badge").count() === 1, `${room}: a sticker is revealed`);
     ok(await page.locator(".lesson-done__pip svg").count() === 1, `${room}: Pip celebrates`);
+    await page.waitForTimeout(900); // let the staggered stat cards finish animating in
+    ok(await page.locator(".lesson-done__stats .stat-card").count() === 3, `${room}: shows all 3 completion stats`);
     await page.screenshot({ path: join(SHOTS, "3-lesson-done.png") });
   }
   await page.locator("#lesson-continue").click();
