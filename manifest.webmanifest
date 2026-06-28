@@ -1,7 +1,7 @@
 {
   "name": "Pip's Playground",
   "short_name": "Pip",
-  "description": "A cozy learning game for 3 year olds — colors, shapes, numbers and animals.",
+  "description": "A cozy English-learning game for ages 3–5 — colors, shapes, numbers, animals, fruits, letters and first words, with optional Chinese voice guidance.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
