@@ -158,9 +158,11 @@ if ("speechSynthesis" in window) {
 export function say(text, opts = {}) {
   if (muted || !text) { opts.onend?.(); return Promise.resolve(); }
   // Bilingual: speak the Chinese guidance first, then the English word.
+  // Keep pitch at 1.0 for Chinese — it's tonal, so raising pitch distorts
+  // the tones and sounds wrong; a slightly slower rate reads clearer.
   if (bilingual && ZH[text]) {
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    return sayOne(ZH[text], { rate: 0.96, pitch: 1.12 }).then(() => sayOne(text, opts));
+    return sayOne(ZH[text], { rate: 0.9, pitch: 1.0 }).then(() => sayOne(text, opts));
   }
   return sayOne(text, opts);
 }

@@ -26,7 +26,7 @@ console.log(`using ${KEYS.length} API key(s)`);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const STYLE = "Read aloud in a warm, friendly, gentle and cheerful voice for a happy three-year-old: ";
-const STYLE_ZH = "用溫暖、親切、溫柔又開心的聲音，慢慢地念給三歲小朋友聽：";
+const STYLE_ZH = "用溫暖、親切、開心又清楚的聲音，念給三歲小朋友聽：";
 const isZh = (t) => /[㐀-鿿]/.test(t);
 
 async function ttsOnce(text, voiceName, key, style = STYLE) {
