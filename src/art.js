@@ -303,11 +303,15 @@ export const icon = {
     <text x="91" y="72" font-family="Baloo 2, Fredoka, sans-serif" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">3</text>`, "numbers"),
 
   animals: () => wrap(`
-    <ellipse cx="60" cy="74" rx="20" ry="17" fill="#ffd07a"/>
-    <circle cx="33" cy="44" r="11" fill="#ffd07a"/>
-    <circle cx="87" cy="44" r="11" fill="#ffd07a"/>
-    <circle cx="44" cy="30" r="10" fill="#ffd07a"/>
-    <circle cx="76" cy="30" r="10" fill="#ffd07a"/>`, "animals"),
+    <circle cx="32" cy="38" r="16" fill="#c08a55"/>
+    <circle cx="88" cy="38" r="16" fill="#c08a55"/>
+    <circle cx="32" cy="38" r="8.5" fill="#edd0aa"/>
+    <circle cx="88" cy="38" r="8.5" fill="#edd0aa"/>
+    <circle cx="60" cy="64" r="40" fill="#d29a64"/>
+    <ellipse cx="60" cy="76" rx="22" ry="17" fill="#f3dcbb"/>
+    <ellipse cx="60" cy="68" rx="7.5" ry="6" fill="#3d2f22"/>
+    <path d="M60 73 v7 M60 80 q-7 3 -12 0 M60 80 q7 3 12 0" stroke="#6b4a2c" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    ${eyes(46, 74, 56, 7.5)}${cheeks(36, 84, 68, 7)}`, "animals"),
 
   letters: () => wrap(`
     <rect x="16" y="40" width="42" height="44" rx="11" fill="#ff8f6b"/>
@@ -367,11 +371,15 @@ export const icon = {
     <circle cx="92" cy="86" r="13" fill="#ffd34e"/>`, "colors and shapes"),
 
   subjAnimals: () => wrap(`
-    <ellipse cx="60" cy="80" rx="24" ry="20" fill="#ffb060"/>
-    <circle cx="30" cy="52" r="11" fill="#ffb060"/>
-    <circle cx="50" cy="34" r="11" fill="#ffb060"/>
-    <circle cx="70" cy="34" r="11" fill="#ffb060"/>
-    <circle cx="90" cy="52" r="11" fill="#ffb060"/>`, "animals and fruits"),
+    <circle cx="32" cy="38" r="16" fill="#c08a55"/>
+    <circle cx="88" cy="38" r="16" fill="#c08a55"/>
+    <circle cx="32" cy="38" r="8.5" fill="#edd0aa"/>
+    <circle cx="88" cy="38" r="8.5" fill="#edd0aa"/>
+    <circle cx="60" cy="64" r="40" fill="#d29a64"/>
+    <ellipse cx="60" cy="76" rx="22" ry="17" fill="#f3dcbb"/>
+    <ellipse cx="60" cy="68" rx="7.5" ry="6" fill="#3d2f22"/>
+    <path d="M60 73 v7 M60 80 q-7 3 -12 0 M60 80 q7 3 12 0" stroke="#6b4a2c" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    ${eyes(46, 74, 56, 7.5)}${cheeks(36, 84, 68, 7)}`, "animals and fruits"),
 };
 
 /* ---------------- UI GLYPHS (single stroke language) ---------------- */
