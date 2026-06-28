@@ -6,33 +6,53 @@ guides toddlers through seven bite-size learning rooms. Built as an installable
 
 ## What it teaches
 
-| Room | Skill | How it plays |
-|------|-------|--------------|
-| **Colors** | Color recognition | "Find the red one!" — tap the matching color bubble |
-| **Shapes** | Shape recognition | "Find the heart!" — tap the matching shape |
-| **Numbers** | Counting 1–5 | Tap each critter to count aloud, then pick the number |
-| **Animals** | Animal names + sounds | "Who says Moo?" — find the animal that makes the sound |
-| **ABC** | Letters + phonics | "Find A — A is for Apple" — tap the matching letter |
-| **Words** | First everyday words | "Find the ball!" — tap the matching picture |
-| **Patterns** | Logic & sequencing | "What comes next?" — complete the repeating pattern |
+The eleven rooms are grouped into four **subjects** on the home screen
+(English · Numbers · Colors & Shapes · Animals & Fruits):
+
+| Room | Subject | Skill | How it plays |
+|------|---------|-------|--------------|
+| **Colors** | Colors & Shapes | Color recognition | "Find the red one!" — tap the matching color bubble |
+| **Shapes** | Colors & Shapes | Shape recognition | "Find the heart!" — tap the matching shape |
+| **Patterns** | Colors & Shapes | Logic & sequencing | "What comes next?" — complete the repeating pattern |
+| **Numbers** | Numbers | Counting 1–5 + adding | Tap each critter to count aloud, then pick the number |
+| **Count to 10** | Numbers | Counting 6–10 + take-away | Count the critters (or how many are left) |
+| **Animals** | Animals & Fruits | Animal names + sounds | "Who says Moo?" — find the animal that makes the sound |
+| **Fruits** | Animals & Fruits | Fruit vocabulary | "Find the banana!" — tap the matching fruit |
+| **ABC** | English | Letters + phonics | "Find A — A is for Apple" — tap the matching letter |
+| **ABC Match** | English | Upper ↔ lowercase | "Find the little a" — match the letter case |
+| **Words** | English | First everyday words | "Find the ball!" — tap the matching picture |
+| **Sight Words** | English | First reading words | "Find the word *the*!" — tap the matching word |
 
 ## Progression (Duolingo-style, toddler-tuned)
 
-The home screen is a **winding journey map**: each room is a "world" with a short
-path of lesson nodes that light up as they're earned (current node bobs a START
-bubble with Pip; later nodes unlock in sequence). Each lesson is a **5-question**
-run with a progress bar and **combo** encouragement ("2 in a row!") that a wrong
-tap resets. Finishing a lesson celebrates with:
+The home screen is a **subject shelf** — four big cards (English · Numbers ·
+Colors & Shapes · Animals & Fruits). Tapping one opens its 2–4 games, so a young
+child only ever faces a handful of choices at a time. **Nothing is locked** — any
+game is always free to play (a wrong tap is never a dead end). Each game is a
+**5-question** lesson with a progress bar and **combo** encouragement ("2 in a
+row!") that a wrong tap resets. Finishing a lesson celebrates with:
 
-- a **crown** for that world (level-up feel), a **collectible sticker** (revealed
-  on the complete screen, kept in a **sticker book** of 19), and a gentle **daily streak**
+- a **crown** for that game (level-up feel), a **collectible sticker** (revealed
+  on the complete screen, kept in a **sticker book** of 26), and a gentle **daily streak**
 - distinct sound effects + **haptics** on every beat (silenced by the mute toggle)
 
-Pip reacts in character (happy on the map, cheering on completion). Progress is
-saved on-device (`localStorage`, `src/progress.js`) — no accounts, no network, no
-data collection (see [`privacy.html`](privacy.html)). Borrowed from Duolingo's
-habit loop, but with **no hearts/lives and no fail state** — toddlers can only
-ever move forward.
+Pip cheers on completion. Progress is saved on-device (`localStorage`,
+`src/progress.js`) — no accounts, no network, no data collection (see
+[`privacy.html`](privacy.html)). Crown/streak counts live in the **Parent Area**
+(hold the settings icon), keeping the child's screens uncluttered. Borrowed from
+Duolingo's habit loop, but with **no hearts/lives and no fail state** — toddlers
+can only ever move forward.
+
+## Bilingual voice (Chinese guidance, for ages 3–5)
+
+A 3-year-old can't read either language, so only the **spoken** line is bilingual —
+text and pictures stay English. With **Chinese guidance** on (Parent Area toggle,
+default on), each prompt is spoken in Mandarin first ("找紅色的！") so the child
+understands the task, then in English ("Find the red one!") — the word being
+learned; a correct answer reinforces it in both. It covers the picture+audio rooms
+a 3yo can do (Colors, Shapes, Numbers, Animals, Fruits); the reading rooms stay
+English-only. Chinese narration uses the same **Gemini TTS** voice, with the
+device's Mandarin voice as an offline fallback (`src/i18n.js`).
 
 ## Designed for tiny hands (research-backed)
 
@@ -83,15 +103,17 @@ npm test
 ## Roadmap
 
 **Now (game design & polish)**
-- ✅ 7 learning rooms, 100% bespoke SVG art
-- ✅ Duolingo-style **journey map**, 5-question lessons, **combos**, crowns
-- ✅ **Sticker book** (19 collectibles), Pip **expressions**, richer SFX + **haptics**
-- ✅ Natural **Gemini TTS** voice (183 recorded clips) with browser-speech fallback
-- ✅ **Simple addition** rounds in the Numbers world (combine two groups, count all)
-- ✅ **Parent area** — hold the settings icon on the map to open stats + a
-  reset-progress control (double-tap confirm)
-- ✅ **More stickers** — balloon, kite, moon added to the Words room + sticker book (19 total)
-- Next: richer content (uppercase/lowercase matching, story moments)
+- ✅ **11 learning rooms** grouped into 4 subjects, 100% bespoke SVG art
+- ✅ Two-level **subject shelf** home (no locks), 5-question lessons, **combos**, crowns
+- ✅ **Sticker book** (26 collectibles), Pip **expressions**, richer SFX + **haptics**
+- ✅ Natural **Gemini TTS** voice with browser-speech fallback
+- ✅ **Numbers**: simple addition + a **Count to 10** room with take-away subtraction
+- ✅ **English**: **ABC Match** (upper/lowercase) and **Sight Words** rooms
+- ✅ **Fruits** room — 7 new bespoke fruit characters + sticker-book entries
+- ✅ **Parent area** — hold the settings icon to open stats, a Chinese-guidance
+  toggle, and a reset-progress control (double-tap confirm)
+- ✅ **Bilingual voice** — Mandarin guidance + English word, for ages 3–5
+- Next: richer content (story moments, more sight words)
 
 **Later — shipping**
 - ✅ **Public URL** — live at https://jeffrey5304lab.github.io/pip-playground/,
@@ -116,11 +138,12 @@ privacy.html          privacy policy (linked from the in-app Parent Area)
 styles.css            visual system (claymorphism, animations)
 src/app.js            boot, router, hub, lesson engine + celebration
 src/progress.js       crowns / stickers / daily streak (localStorage)
-src/audio.js          SFX + English voice
+src/audio.js          SFX + bilingual (Chinese/English) voice
+src/i18n.js           Chinese guidance lines for bilingual mode
 src/mascot.js         Pip the chick (inline SVG)
-src/art.js            bespoke SVG art library (animals, icons, rewards, glyphs)
+src/art.js            bespoke SVG art library (animals, fruits, icons, rewards, glyphs)
 src/confetti.js       celebration burst
-src/games/*.js        the seven learning rooms
+src/games/*.js        the eleven learning rooms
 manifest.webmanifest  PWA manifest
 sw.js                 offline service worker
 icons/                app icons (icon-maskable.svg has a safe-zone margin for Android)
