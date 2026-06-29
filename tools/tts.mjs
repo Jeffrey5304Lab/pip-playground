@@ -193,7 +193,11 @@ async function generateAll(voice) {
   for (const text of phrases) {
     const h = hash(text);
     const file = `${h}.m4a`;
-    if (manifest.clips[text] && existsSync(join(outDir, file))) { skipped++; continue; }
+    // skip if already mapped to an existing file — honour the manifest's actual
+    // target (which may be an alias to a different hash, e.g. "6!" → "6"), not
+    // the recomputed hash, so aliased entries aren't pointlessly regenerated.
+    const have = manifest.clips[text];
+    if (have && existsSync(join(outDir, have))) { skipped++; continue; }
 
     // 1) synthesize (tts() already rotates keys + backs off through transient limits)
     let pcm;
