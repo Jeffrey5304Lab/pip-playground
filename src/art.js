@@ -402,6 +402,9 @@ export const ui = {
     <path d="M31 19 q5 5 0 10 M35 15 q9 9 0 18" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`, "say it again"),
   close: () => glyph(`
     <path d="M14 14 L34 34 M34 14 L14 34" stroke="#8a7560" stroke-width="5" stroke-linecap="round"/>`, "close"),
+  hand: () => glyph(`
+    <path d="M20 6 q4 0 4 5 v12 q3 -3 6 -2 q3 0 3 4 q3 -2 5 1 q2 2 1 6 l-2 9 q-2 7 -10 7 h-6 q-5 0 -8 -5 l-7 -11 q-2 -4 2 -6 q3 -2 6 2 l3 4 V11 q0 -5 4 -5z"
+      fill="#ffe0b0" stroke="#e0a868" stroke-width="2" stroke-linejoin="round"/>`, "tap here"),
   crown: () => glyph(`
     <path d="M8 34 L12 16 L20 26 L24 12 L28 26 L36 16 L40 34 Z" fill="#ffce4a" stroke="#f0ad1f" stroke-width="2" stroke-linejoin="round"/>
     <rect x="8" y="34" width="32" height="6" rx="2" fill="#f0ad1f"/>

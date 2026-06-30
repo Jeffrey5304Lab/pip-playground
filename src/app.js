@@ -65,12 +65,34 @@ let app, soundBtn, current = null, lesson = null, currentSubject = null;
    Games register their correct choice via api.setCorrect(el). After two
    wrong taps we gently spotlight it (errorless learning); after a few idle
    seconds we re-speak the prompt and bob it back into attention. */
-let roundCorrectEl = null, roundWrongN = 0, idleTimer = null, roundSpoken = "";
+let roundCorrectEl = null, roundWrongN = 0, idleTimer = null, roundSpoken = "", coachEl = null;
 const IDLE_MS = 6000;
 function clearScaffold() {
   clearTimeout(idleTimer); idleTimer = null;
   if (roundCorrectEl) roundCorrectEl.classList.remove("is-hint", "is-nudge");
   roundCorrectEl = null; roundWrongN = 0;
+  hideCoach();
+}
+
+/* First-ever lesson: a bobbing hand points at the correct choice so the
+   child learns the tap gesture. Shown until their first tap, then never again. */
+function hideCoach() { if (coachEl) { coachEl.remove(); coachEl = null; } }
+function showCoach(el) {
+  if (!el) return;
+  hideCoach();
+  const r = el.getBoundingClientRect();
+  coachEl = document.createElement("div");
+  coachEl.className = "tap-coach";
+  coachEl.innerHTML = artUi.hand();
+  coachEl.style.left = `${r.left + r.width / 2}px`;
+  coachEl.style.top = `${r.top + r.height * 0.58}px`;
+  document.body.appendChild(coachEl);
+}
+function dismissCoach() {
+  if (coachEl || !localStorage.getItem("pip.coached")) {
+    try { localStorage.setItem("pip.coached", "1"); } catch (_) {}
+    hideCoach();
+  }
 }
 function armIdle() {
   clearTimeout(idleTimer);
@@ -381,7 +403,13 @@ function openRoom(room) {
     // First two questions show 2 choices (easier for the youngest), then 3.
     choices: () => (lesson && lesson.done < 2 ? 2 : 3),
     // Register the round's correct element so the engine can spotlight it.
-    setCorrect: (el) => { clearTimeout(idleTimer); roundCorrectEl = el; roundWrongN = 0; armIdle(); },
+    setCorrect: (el) => {
+      clearTimeout(idleTimer); roundCorrectEl = el; roundWrongN = 0; armIdle();
+      // first-ever question: point a hand at the answer to teach "tap"
+      if (el && lesson && lesson.done === 0 && !localStorage.getItem("pip.coached")) {
+        setTimeout(() => { if (roundCorrectEl === el) { showCoach(el); el.classList.add("is-nudge"); } }, 600);
+      }
+    },
     reward: (label, next) => onCorrect(label, next),
     wrong: () => onWrong(),
   };
@@ -399,6 +427,7 @@ function onCorrect(label, next) {
   const fill = $("#lesson-fill");
   if (fill) fill.style.width = `${(lesson.done / lesson.total) * 100}%`;
 
+  dismissCoach();
   clearScaffold();
   const combo = lesson.combo;
   updateCombo(combo);
@@ -421,6 +450,7 @@ function onCorrect(label, next) {
 
 function onWrong() {
   if (!lesson) return;
+  dismissCoach();
   lesson.combo = 0;
   updateCombo(0);
   haptic(10);
