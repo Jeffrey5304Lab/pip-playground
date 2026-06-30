@@ -191,12 +191,15 @@ html, body {
   display: flex; align-items: center; justify-content: center; gap: 12px;
 }
 .prompt__say {
-  width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer; flex: none;
-  background: var(--pip-yellow); box-shadow: 0 4px 0 var(--pip-yellow-d);
+  width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer; flex: none;
+  background: var(--pip-yellow); box-shadow: 0 5px 0 var(--pip-yellow-d);
   display: grid; place-items: center;
+  animation: say-pulse 2.6s ease-in-out infinite;
 }
-.prompt__say .glyph { width: 28px; height: 28px; }
-.prompt__say:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--pip-yellow-d); }
+.prompt__say .glyph { width: 34px; height: 34px; }
+.prompt__say:active { transform: translateY(4px) scale(.96); box-shadow: 0 1px 0 var(--pip-yellow-d); animation: none; }
+@keyframes say-pulse { 0%,82%,100% { transform: scale(1); } 88% { transform: scale(1.12); } 94% { transform: scale(.98); } }
+@media (prefers-reduced-motion: reduce) { .prompt__say { animation: none; } }
 
 .stage {
   flex: 1; display: grid; place-content: center; align-content: center;
@@ -240,6 +243,16 @@ html, body {
   animation: pop-in .5s cubic-bezier(.18,1.4,.4,1) both;
 }
 .critter .art { width: 100%; height: 100%; }
+.critter { position: relative; }
+/* running count that pops onto each critter as it's tapped */
+.critter__n {
+  position: absolute; top: -6px; right: -6px; min-width: 26px; height: 26px; padding: 0 4px;
+  display: grid; place-items: center; border-radius: 50%;
+  background: linear-gradient(180deg,#ffd06b,#f6a92f); color: #fff;
+  font-family: inherit; font-weight: 800; font-size: 16px; line-height: 1;
+  box-shadow: 0 2px 0 #d98a1c, 0 3px 6px var(--shadow);
+  animation: pop-spring .45s cubic-bezier(.2,1.6,.4,1) both;
+}
 .critter:active { transform: scale(1.18) rotate(-6deg); }
 .critter.is-counted { animation: bop .5s ease; }
 .critter[data-done] { opacity: .96; }

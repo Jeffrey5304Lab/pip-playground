@@ -35,6 +35,7 @@ export function count10Game(stage, prompt, api) {
           if (c.dataset.done) return;
           c.dataset.done = "1"; counted++;
           c.classList.add("is-counted");
+          c.insertAdjacentHTML("beforeend", `<span class="critter__n">${counted}</span>`);
           api.sfxCount(counted);
           api.say(String(counted), { rate: 1 });
         };

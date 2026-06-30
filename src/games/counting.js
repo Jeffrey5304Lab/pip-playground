@@ -17,6 +17,7 @@ export function countingGame(stage, prompt, api) {
         if (c.dataset.done) return;
         c.dataset.done = "1"; counted++;
         c.classList.add("is-counted");
+        c.insertAdjacentHTML("beforeend", `<span class="critter__n">${counted}</span>`);
         api.sfxCount(counted);
         api.say(String(counted), { rate: 1 });
       };
@@ -26,7 +27,8 @@ export function countingGame(stage, prompt, api) {
 
   function round() {
     counted = 0;
-    const isAdd = Math.random() < 0.5;
+    // mostly plain counting for the youngest; addition appears less often
+    const isAdd = Math.random() < 0.3;
     const critter = api.rand(CRITTERS);
     prompt.set(`How many?`, "How many? Tap them to count!");
     api.say("How many? Tap them to count!");
