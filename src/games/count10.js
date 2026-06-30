@@ -43,11 +43,14 @@ export function count10Game(stage, prompt, api) {
     }
 
     const opts = stage.querySelector(".choices");
-    for (const n of numberChoices(answer)) {
+    const want = api.choices();
+    opts.style.setProperty("--cols", want);
+    for (const num of numberChoices(answer, want)) {
       const b = document.createElement("button");
-      b.className = "num-btn"; b.textContent = String(n); b.setAttribute("aria-label", `${n}`);
-      b.onclick = () => pick(b, n);
+      b.className = "num-btn"; b.textContent = String(num); b.setAttribute("aria-label", `${num}`);
+      b.onclick = () => pick(b, num);
       opts.appendChild(b);
+      if (num === answer) api.setCorrect(b);
     }
   }
 
@@ -79,9 +82,9 @@ export function count10Game(stage, prompt, api) {
   return { destroy() {} };
 }
 
-function numberChoices(answer) {
+function numberChoices(answer, count = 3) {
   const set = new Set([answer]);
-  while (set.size < 3) {
+  while (set.size < count) {
     const d = answer + (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 2));
     if (d >= 1 && d <= 10) set.add(d);
   }

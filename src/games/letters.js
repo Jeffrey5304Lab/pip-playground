@@ -14,13 +14,14 @@ export function lettersGame(stage, prompt, api) {
   let target = null;
 
   function round() {
-    const choices = api.sample(LETTERS, 3);
+    const n = api.choices();
+    const choices = api.sample(LETTERS, n);
     target = api.rand(choices);
     const word = WORD_FOR[target];
     prompt.set(`Find the <b>${target}</b>`, `Find the letter ${target}. ${target} is for ${word}.`);
     api.say(`Find the letter ${target}. ${target} is for ${word}.`);
 
-    stage.innerHTML = `<div class="choices" style="--cols:3"></div>`;
+    stage.innerHTML = `<div class="choices" style="--cols:${n}"></div>`;
     const row = stage.firstElementChild;
     choices.forEach((L, i) => {
       const b = document.createElement("button");
@@ -31,6 +32,7 @@ export function lettersGame(stage, prompt, api) {
       b.innerHTML = `<span class="letter-tile__up">${L}</span><span class="letter-tile__low">${L.toLowerCase()}</span>`;
       b.onclick = () => pick(b, L);
       row.appendChild(b);
+      if (L === target) api.setCorrect(b);
     });
   }
 

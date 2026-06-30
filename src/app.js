@@ -61,6 +61,28 @@ const subjRooms = (subj) => subj.rooms.map((id) => ROOMS.find((r) => r.id === id
 
 let app, soundBtn, current = null, lesson = null, currentSubject = null;
 
+/* ---- toddler scaffolding: never-stuck hint + idle nudge ----
+   Games register their correct choice via api.setCorrect(el). After two
+   wrong taps we gently spotlight it (errorless learning); after a few idle
+   seconds we re-speak the prompt and bob it back into attention. */
+let roundCorrectEl = null, roundWrongN = 0, idleTimer = null, roundSpoken = "";
+const IDLE_MS = 6000;
+function clearScaffold() {
+  clearTimeout(idleTimer); idleTimer = null;
+  if (roundCorrectEl) roundCorrectEl.classList.remove("is-hint", "is-nudge");
+  roundCorrectEl = null; roundWrongN = 0;
+}
+function armIdle() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    if (!lesson || !roundCorrectEl) return;
+    say(roundSpoken);
+    roundCorrectEl.classList.remove("is-nudge"); void roundCorrectEl.offsetWidth;
+    roundCorrectEl.classList.add("is-nudge");
+    armIdle();                       // keep gently reminding
+  }, IDLE_MS);
+}
+
 /* ---------- helpers passed to games ---------- */
 const rand = (arr) => arr[(Math.random() * arr.length) | 0];
 function sample(arr, n) {
@@ -132,7 +154,7 @@ function start() {
 }
 
 /* ---------- views ---------- */
-function clearGame() { if (current && current.destroy) current.destroy(); current = null; lesson = null; }
+function clearGame() { clearScaffold(); if (current && current.destroy) current.destroy(); current = null; lesson = null; }
 
 /** Re-trigger the view-enter transition on the freshly painted screen. */
 function flashView() { app.classList.remove("view-enter"); void app.offsetWidth; app.classList.add("view-enter"); }
@@ -350,13 +372,16 @@ function openRoom(room) {
   flashView();
 
   const promptText = $("#prompt-text");
-  let lastSpoken = "";
-  const prompt = { set(html, spoken) { promptText.innerHTML = html; lastSpoken = spoken || html; } };
-  $("#say-btn").onclick = () => { sfxTap(); say(lastSpoken); };
+  const prompt = { set(html, spoken) { promptText.innerHTML = html; roundSpoken = spoken || html; } };
+  $("#say-btn").onclick = () => { sfxTap(); say(roundSpoken); };
 
   const api = {
     say, sfxTap, sfxCorrect, sfxTryAgain, sfxCelebrate, sfxCount,
     rand, sample,
+    // First two questions show 2 choices (easier for the youngest), then 3.
+    choices: () => (lesson && lesson.done < 2 ? 2 : 3),
+    // Register the round's correct element so the engine can spotlight it.
+    setCorrect: (el) => { clearTimeout(idleTimer); roundCorrectEl = el; roundWrongN = 0; armIdle(); },
     reward: (label, next) => onCorrect(label, next),
     wrong: () => onWrong(),
   };
@@ -374,6 +399,7 @@ function onCorrect(label, next) {
   const fill = $("#lesson-fill");
   if (fill) fill.style.width = `${(lesson.done / lesson.total) * 100}%`;
 
+  clearScaffold();
   const combo = lesson.combo;
   updateCombo(combo);
   flashPraise(label);
@@ -398,6 +424,10 @@ function onWrong() {
   lesson.combo = 0;
   updateCombo(0);
   haptic(10);
+  // errorless learning: after two misses, gently spotlight the right one
+  roundWrongN++;
+  if (roundWrongN >= 2 && roundCorrectEl) roundCorrectEl.classList.add("is-hint");
+  armIdle();
 }
 
 function updateCombo(n) {

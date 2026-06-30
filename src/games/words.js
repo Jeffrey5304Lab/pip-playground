@@ -5,12 +5,13 @@ export function wordsGame(stage, prompt, api) {
   let target = null;
 
   function round() {
-    const choices = api.sample(OBJECT_NAMES, 3);
+    const n = api.choices();
+    const choices = api.sample(OBJECT_NAMES, n);
     target = api.rand(choices);
     prompt.set(`Find the <b>${target}</b>!`, `Find the ${target}!`);
     api.say(`Find the ${target}!`);
 
-    stage.innerHTML = `<div class="choices" style="--cols:3"></div>`;
+    stage.innerHTML = `<div class="choices" style="--cols:${n}"></div>`;
     const row = stage.firstElementChild;
     choices.forEach((name, i) => {
       const b = document.createElement("button");
@@ -21,6 +22,7 @@ export function wordsGame(stage, prompt, api) {
                      <span class="animal-card__name">${name}</span>`;
       b.onclick = () => pick(b, name);
       row.appendChild(b);
+      if (name === target) api.setCorrect(b);
     });
   }
 

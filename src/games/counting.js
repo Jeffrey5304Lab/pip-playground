@@ -51,14 +51,17 @@ export function countingGame(stage, prompt, api) {
       addCritters(stage.querySelector(".count-field"), answer, critter);
     }
 
-    // number choices: the answer + two nearby distractors
+    // number choices: the answer + nearby distractors (2 early, then 3)
     const opts = stage.querySelector(".choices");
-    const nums = numberChoices(answer);
-    for (const n of nums) {
+    const want = api.choices();
+    const nums = numberChoices(answer, want);
+    opts.style.setProperty("--cols", want);
+    for (const num of nums) {
       const b = document.createElement("button");
-      b.className = "num-btn"; b.textContent = String(n); b.setAttribute("aria-label", `${n}`);
-      b.onclick = () => pick(b, n);
+      b.className = "num-btn"; b.textContent = String(num); b.setAttribute("aria-label", `${num}`);
+      b.onclick = () => pick(b, num);
       opts.appendChild(b);
+      if (num === answer) api.setCorrect(b);
     }
   }
 
@@ -79,9 +82,9 @@ export function countingGame(stage, prompt, api) {
   return { destroy() {} };
 }
 
-function numberChoices(answer) {
+function numberChoices(answer, count = 3) {
   const set = new Set([answer]);
-  while (set.size < 3) {
+  while (set.size < count) {
     let d = answer + (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 2));
     if (d >= 1 && d <= 9) set.add(d);
   }

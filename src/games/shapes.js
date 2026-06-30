@@ -18,12 +18,13 @@ export function shapesGame(stage, prompt, api) {
   let target = null;
 
   function round() {
-    const kinds = api.sample(SHAPES, 3);
+    const n = api.choices();
+    const kinds = api.sample(SHAPES, n);
     target = api.rand(kinds);
     prompt.set(`Find the <b>${target}</b>!`, `Find the ${target}!`);
     api.say(`Find the ${target}!`);
 
-    stage.innerHTML = `<div class="choices" style="--cols:3"></div>`;
+    stage.innerHTML = `<div class="choices" style="--cols:${n}"></div>`;
     const row = stage.firstElementChild;
     kinds.forEach((k, i) => {
       const b = document.createElement("button");
@@ -32,6 +33,7 @@ export function shapesGame(stage, prompt, api) {
       b.innerHTML = shapeSVG(k, FILLS[i % FILLS.length]);
       b.onclick = () => pick(b, k);
       row.appendChild(b);
+      if (k === target) api.setCorrect(b);
     });
   }
 

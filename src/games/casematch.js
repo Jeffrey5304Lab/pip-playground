@@ -8,7 +8,8 @@ export function casematchGame(stage, prompt, api) {
   let showUpperTarget = true;
 
   function round() {
-    const choices = api.sample(LETTERS, 3);
+    const n = api.choices();
+    const choices = api.sample(LETTERS, n);
     target = api.rand(choices);
     showUpperTarget = Math.random() < 0.5;
 
@@ -22,7 +23,7 @@ export function casematchGame(stage, prompt, api) {
 
     stage.innerHTML = `
       <div class="match-target" style="color:var(--world,#ff9233)">${showUpperTarget ? target : target.toLowerCase()}</div>
-      <div class="choices" style="--cols:3"></div>`;
+      <div class="choices" style="--cols:${n}"></div>`;
 
     const row = stage.querySelector(".choices");
     choices.forEach((L, i) => {
@@ -35,6 +36,7 @@ export function casematchGame(stage, prompt, api) {
       b.innerHTML = `<span class="letter-tile__up">${shown}</span>`;
       b.onclick = () => pick(b, L);
       row.appendChild(b);
+      if (L === target) api.setCorrect(b);
     });
   }
 

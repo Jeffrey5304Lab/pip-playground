@@ -14,12 +14,13 @@ export function colorsGame(stage, prompt, api) {
   let target = null;
 
   function round() {
-    const choices = api.sample(PALETTE, 3);
+    const n = api.choices();
+    const choices = api.sample(PALETTE, n);
     target = api.rand(choices);
     prompt.set(`Find the <b style="color:${target.css}">${target.name}</b> one!`, `Find the ${target.name} one!`);
     api.say(`Find the ${target.name} one!`);
 
-    stage.innerHTML = `<div class="choices" style="--cols:3"></div>`;
+    stage.innerHTML = `<div class="choices" style="--cols:${n}"></div>`;
     const row = stage.firstElementChild;
     for (const c of choices) {
       const b = document.createElement("button");
@@ -28,6 +29,7 @@ export function colorsGame(stage, prompt, api) {
       b.setAttribute("aria-label", c.name);
       b.onclick = () => pick(b, c);
       row.appendChild(b);
+      if (c.name === target.name) api.setCorrect(b);
     }
   }
 

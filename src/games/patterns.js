@@ -39,11 +39,19 @@ export function patternsGame(stage, prompt, api) {
     const optList = api.sample([...opts].map((nm) => PALETTE.find((p) => p.name === nm)), Math.min(3, opts.size));
     while (optList.length < 3) { const c = api.rand(PALETTE); if (!optList.includes(c)) optList.push(c); }
 
+    // 2 options for the youngest first questions, then 3 — always keep the answer
+    const want = api.choices();
+    let shown = api.sample(optList, optList.length);
+    if (want < shown.length) {
+      const others = shown.filter((c) => c.name !== answer.name).slice(0, want - 1);
+      shown = api.sample([answer, ...others], want);
+    }
+
     stage.innerHTML = `
       <div class="pattern-row">${seq.join("")}<span class="bead bead--slot">?</span></div>
-      <div class="choices" style="--cols:3; margin-top:8px"></div>`;
+      <div class="choices" style="--cols:${want}; margin-top:8px"></div>`;
     const row = stage.querySelector(".choices");
-    api.sample(optList, optList.length).forEach((c, i) => {
+    shown.forEach((c, i) => {
       const b = document.createElement("button");
       b.className = "token";
       b.style.background = `radial-gradient(circle at 38% 32%, ${tint(c.css)}, ${c.css})`;
@@ -51,6 +59,7 @@ export function patternsGame(stage, prompt, api) {
       b.setAttribute("aria-label", c.name);
       b.onclick = () => pick(b, c);
       row.appendChild(b);
+      if (c.name === answer.name) api.setCorrect(b);
     });
   }
 

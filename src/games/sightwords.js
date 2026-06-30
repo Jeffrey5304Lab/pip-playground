@@ -13,12 +13,13 @@ export function sightwordsGame(stage, prompt, api) {
   let target = null;
 
   function round() {
-    const choices = api.sample(WORDS, 3);
+    const n = api.choices();
+    const choices = api.sample(WORDS, n);
     target = api.rand(choices);
     prompt.set(`Find the word <b>${target}</b>!`, `Find the word ${target}!`);
     api.say(`Find the word ${target}!`);
 
-    stage.innerHTML = `<div class="choices" style="--cols:3"></div>`;
+    stage.innerHTML = `<div class="choices" style="--cols:${n}"></div>`;
     const row = stage.firstElementChild;
     choices.forEach((word, i) => {
       const b = document.createElement("button");
@@ -29,6 +30,7 @@ export function sightwordsGame(stage, prompt, api) {
       b.textContent = word;
       b.onclick = () => pick(b, word);
       row.appendChild(b);
+      if (word === target) api.setCorrect(b);
     });
   }
 

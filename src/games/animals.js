@@ -16,12 +16,13 @@ export function animalsGame(stage, prompt, api) {
   let target = null;
 
   function round() {
-    const choices = api.sample(ANIMALS, 3);
+    const n = api.choices();
+    const choices = api.sample(ANIMALS, n);
     target = api.rand(choices);
     prompt.set(`Who says <b>${target.sound}</b>?`, `Who says ${target.sound}? Find the ${target.name}!`);
     api.say(`Who says ${target.sound}? Find the ${target.name}!`);
 
-    stage.innerHTML = `<div class="choices" style="--cols:3"></div>`;
+    stage.innerHTML = `<div class="choices" style="--cols:${n}"></div>`;
     const row = stage.firstElementChild;
     choices.forEach((a, i) => {
       const b = document.createElement("button");
@@ -32,6 +33,7 @@ export function animalsGame(stage, prompt, api) {
                      <span class="animal-card__name">${a.name}</span>`;
       b.onclick = () => pick(b, a);
       row.appendChild(b);
+      if (a.name === target.name) api.setCorrect(b);
     });
   }
 
