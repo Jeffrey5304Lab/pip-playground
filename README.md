@@ -57,8 +57,10 @@ device's Mandarin voice as an offline fallback (`src/i18n.js`).
 ## Designed for tiny hands (research-backed)
 
 - **Big touch targets**, single-tap only — no swipes, drags or double-taps.
-- **Spoken English instructions** on every screen (built-in speech, no downloads) + a 🔈 "say it again" button.
+- **Spoken instructions** on every screen (built-in speech, no downloads) + a big "say it again" button; optional **Chinese guidance** so a pre-reader always understands the task.
 - **No fail state** — a wrong tap gives a gentle wiggle and a friendly "try again", never a scary buzzer.
+- **Never stuck (errorless learning)** — after two misses the correct choice gently glows, and after a few idle seconds the prompt is re-spoken and the answer bobs back into view, so a 3-year-old always finishes happy.
+- **Easy on-ramp** — the first two questions of a lesson show 2 choices, then 3; the very first lesson points a "tap here" hand at the answer.
 - **Instant reward** — stars, confetti and cheerful praise reinforce every success.
 - **One task per screen**, minimal text, cozy claymorphism art for low cognitive load.
 - Respects `prefers-reduced-motion` and has a global **mute** toggle.
