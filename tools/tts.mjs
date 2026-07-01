@@ -28,6 +28,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const STYLE = "Read aloud in a warm, friendly, gentle and cheerful voice for a happy three-year-old: ";
 const STYLE_ZH = "用溫暖、親切、開心又清楚的聲音，念給三歲小朋友聽：";
 const isZh = (t) => /[㐀-鿿]/.test(t);
+// phrases the model refuses to voice (single char + ！) — skip, use device voice
+const NO_AUDIO = new Set(["6!", "7!", "一！", "二！", "三！", "四！", "五！", "六！", "七！", "八！", "九！", "十！"]);
 
 async function ttsOnce(text, voiceName, key, style = STYLE) {
   const res = await fetch(
@@ -69,6 +71,9 @@ export async function tts(text, voiceName, style = STYLE) {
       return await ttsOnce(text, voiceName, key, style);
     } catch (e) {
       lastErr = e;
+      // "No audio in response" is a deterministic content refusal (ultra-short
+      // lines like "一！"/"6!") — retrying just burns quota, so give up at once.
+      if (/no audio/i.test(e.message)) throw e;
       if (a === maxAttempts - 1) break;
       await sleep(/quota|rate|429|exhausted/i.test(e.message) ? 18000 : 6000);
     }
@@ -191,6 +196,10 @@ async function generateAll(voice) {
   console.log(`${phrases.length} phrases → audio/ (voice ${voice})`);
   let made = 0, skipped = 0, failed = 0, consec = 0;
   for (const text of phrases) {
+    // The TTS model deterministically returns no audio for ultra-short
+    // "<one char>！" lines, so never spend a request on them — they fall back
+    // to the device voice in-app. (English "6!"/"7!" alias the "6"/"7" clips.)
+    if (NO_AUDIO.has(text)) { skipped++; continue; }
     const h = hash(text);
     const file = `${h}.m4a`;
     // skip if already mapped to an existing file — honour the manifest's actual
@@ -206,8 +215,16 @@ async function generateAll(voice) {
       consec = 0;
     } catch (e) {
       console.error(`  TTS FAILED ${JSON.stringify(text)}: ${e.message.slice(0, 60)}`);
-      failed++; consec++;
-      if (consec >= 6) { console.log(`\n⛔ persistent failures (daily quota likely gone) — stopping. ${made} made, ${phrases.length - made - skipped} left. Re-run later to resume.`); break; }
+      failed++;
+      // Only quota/rate errors mean "come back later" — a content failure like
+      // "No audio in response" (the model refuses ultra-short "一！"/"6!" lines)
+      // must NOT trip the daily-quota stop, or a run of them halts the batch
+      // before the good clips are reached.
+      const quotaErr = /quota|rate|429|exhausted|exceeded/i.test(e.message);
+      if (quotaErr) {
+        consec++;
+        if (consec >= 6) { console.log(`\n⛔ persistent quota failures — stopping. ${made} made, ${phrases.length - made - skipped} left. Re-run later to resume.`); break; }
+      }
       continue;
     }
 
